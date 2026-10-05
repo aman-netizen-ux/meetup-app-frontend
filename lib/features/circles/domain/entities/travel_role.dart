@@ -1,0 +1,1 @@
+enum TravelRole { mover, anchor }
