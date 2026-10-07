@@ -6,6 +6,7 @@ import '../domain/entities/circle_snapshot.dart';
 import '../domain/entities/circle_state.dart';
 import 'circle_detail_screen.dart';
 import 'state/circle_detail_controller.dart';
+import 'state/circle_detail_action_state.dart';
 
 class CircleDetailScreenState extends State<CircleDetailScreen> {
   late final CircleDetailController _controller = CircleDetailController(
@@ -53,7 +54,7 @@ class CircleDetailScreenState extends State<CircleDetailScreen> {
 
   @override
   Widget build(BuildContext context) => ValueListenableBuilder<CircleSnapshot?>(
-    valueListenable: _controller,
+    valueListenable: _controller.circle,
     builder: (context, circle, _) {
       if (circle == null) {
         return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -137,16 +138,6 @@ class CircleDetailScreenState extends State<CircleDetailScreen> {
                   ),
                 ),
               ),
-              if (_controller.error != null)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: Text(
-                    _controller.error!,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-                  ),
-                ),
               const SizedBox(height: 18),
               if (widget.isOrganizer && circle.state != CircleState.ended) ...[
                 InvitationLinkPanel(
@@ -155,12 +146,39 @@ class CircleDetailScreenState extends State<CircleDetailScreen> {
                 ),
                 const SizedBox(height: 10),
               ],
-              if (widget.isOrganizer && circle.state != CircleState.ended)
-                OutlinedButton.icon(
-                  onPressed: _controller.busy ? null : _end,
-                  icon: const Icon(Icons.stop_circle_outlined),
-                  label: const Text('End circle'),
+              ValueListenableBuilder<CircleDetailActionState>(
+                valueListenable: _controller.action,
+                builder: (context, action, _) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (action.error != null)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Text(
+                          action.error!,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                        ),
+                      ),
+                    if (widget.isOrganizer && circle.state != CircleState.ended)
+                      OutlinedButton.icon(
+                        onPressed: action.busy ? null : _end,
+                        icon: action.busy
+                            ? const SizedBox.square(
+                                dimension: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Icon(Icons.stop_circle_outlined),
+                        label: Text(
+                          action.busy ? 'Ending circle…' : 'End circle',
+                        ),
+                      ),
+                  ],
                 ),
+              ),
             ],
           ),
         ),

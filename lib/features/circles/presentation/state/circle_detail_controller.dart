@@ -3,40 +3,50 @@ import 'package:flutter/foundation.dart';
 import '../../domain/entities/circle_snapshot.dart';
 import '../../domain/entities/end_reason.dart';
 import '../../domain/repositories/circle_repository.dart';
+import 'circle_detail_action_state.dart';
 
-class CircleDetailController extends ValueNotifier<CircleSnapshot?> {
+class CircleDetailController {
   CircleDetailController(this._repository, CircleSnapshot initial)
-    : super(initial);
+    : circle = ValueNotifier(initial);
 
   final CircleRepository _repository;
-  bool busy = false;
-  String? error;
+  final ValueNotifier<CircleSnapshot?> circle;
+  final ValueNotifier<CircleDetailActionState> action = ValueNotifier(
+    const CircleDetailActionState(),
+  );
 
   Future<void> refresh() async {
-    if (value == null) return;
+    if (circle.value == null) return;
     try {
-      value = await _repository.getCircle(value!.id);
-      error = null;
+      circle.value = await _repository.getCircle(circle.value!.id);
+      action.value = const CircleDetailActionState();
     } catch (_) {
-      error = 'Could not refresh this circle.';
-      notifyListeners();
+      action.value = const CircleDetailActionState(
+        error: 'Could not refresh this circle.',
+      );
     }
   }
 
   Future<bool> end() async {
-    if (value == null || busy) return false;
-    busy = true;
-    notifyListeners();
+    if (circle.value == null || action.value.busy) return false;
+    action.value = const CircleDetailActionState(busy: true);
     try {
-      value = await _repository.endCircle(value!.id, EndReason.organizerEnded);
-      error = null;
+      circle.value = await _repository.endCircle(
+        circle.value!.id,
+        EndReason.organizerEnded,
+      );
+      action.value = const CircleDetailActionState();
       return true;
     } catch (_) {
-      error = 'Could not end this circle. Try again.';
+      action.value = const CircleDetailActionState(
+        error: 'Could not end this circle. Try again.',
+      );
       return false;
-    } finally {
-      busy = false;
-      notifyListeners();
     }
+  }
+
+  void dispose() {
+    circle.dispose();
+    action.dispose();
   }
 }
