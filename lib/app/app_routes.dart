@@ -9,6 +9,7 @@ import '../features/invitations/presentation/state/pending_invitation_controller
 import '../features/contacts/domain/repositories/contact_repository.dart';
 import '../features/contacts/domain/repositories/share_service.dart';
 import '../features/circles/domain/repositories/mover_location_permission.dart';
+import '../features/circles/domain/repositories/device_location_tracker.dart';
 
 class AppRoutes {
   const AppRoutes(
@@ -20,6 +21,7 @@ class AppRoutes {
     this.contactRepository,
     this.shareService,
     this.moverLocationPermission,
+    this.locationTracker,
   );
 
   final AuthController authController;
@@ -30,6 +32,7 @@ class AppRoutes {
   final ContactRepository contactRepository;
   final ShareService shareService;
   final MoverLocationPermission moverLocationPermission;
+  final DeviceLocationTracker locationTracker;
 
   static const home = '/';
 
@@ -62,6 +65,7 @@ class AppRoutes {
           contactRepository: contactRepository,
           shareService: shareService,
           moverLocationPermission: moverLocationPermission,
+          locationTracker: locationTracker,
         ),
       );
 }

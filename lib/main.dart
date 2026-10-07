@@ -22,6 +22,7 @@ import 'features/contacts/data/datasources/contact_remote_data_source.dart';
 import 'features/contacts/data/platform/platform_share_service.dart';
 import 'features/contacts/data/repositories/contact_repository_impl.dart';
 import 'features/circles/data/platform/geolocator_mover_location_permission.dart';
+import 'features/circles/data/platform/geolocator_device_location_tracker.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -60,6 +61,7 @@ Future<void> main() async {
       ),
       shareService: const PlatformShareService(),
       moverLocationPermission: const GeolocatorMoverLocationPermission(),
+      locationTracker: const GeolocatorDeviceLocationTracker(),
     ),
   );
 }

@@ -14,10 +14,12 @@ import 'circle_header_card.dart';
 import 'circle_live_section.dart';
 import 'circle_member_card.dart';
 import 'member_role_card.dart';
+import 'location_sharing_card.dart';
 import 'state/circle_connection_status.dart';
 import 'state/circle_detail_action_state.dart';
 import 'state/circle_detail_controller.dart';
 import 'state/member_role_controller.dart';
+import 'state/location_sharing_controller.dart';
 
 class CircleDetailScreenState extends State<CircleDetailScreen> {
   late final CircleDetailController _controller = CircleDetailController(
@@ -33,6 +35,15 @@ class CircleDetailScreenState extends State<CircleDetailScreen> {
     userId: widget.currentUserId,
     initial: _myMember(widget.initial),
   );
+  late final LocationSharingController _locationController =
+      LocationSharingController(
+        repository: widget.repository,
+        permission: widget.moverLocationPermission,
+        tracker: widget.locationTracker,
+        circleId: widget.initial.id,
+        userId: widget.currentUserId,
+        onSnapshot: _controller.apply,
+      );
 
   CircleMember _myMember(CircleSnapshot circle) => circle.members.firstWhere(
     (member) => member.userId == widget.currentUserId,
@@ -42,6 +53,7 @@ class CircleDetailScreenState extends State<CircleDetailScreen> {
   void initState() {
     super.initState();
     _controller.circle.addListener(_syncMyRole);
+    _locationController.sync(widget.initial);
     _controller.refresh();
     _controller.startLiveUpdates();
   }
@@ -52,12 +64,40 @@ class CircleDetailScreenState extends State<CircleDetailScreen> {
     _controller.dispose();
     _invitationController.dispose();
     _roleController.dispose();
+    _locationController.dispose();
     super.dispose();
   }
 
   void _syncMyRole() {
     final circle = _controller.circle.value;
-    if (circle != null) _roleController.sync(_myMember(circle));
+    if (circle != null) {
+      _roleController.sync(_myMember(circle));
+      _locationController.sync(circle);
+    }
+  }
+
+  Future<void> _prepareLocationSharing() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        icon: const Icon(Icons.shield_outlined, color: Color(0xFF168C83)),
+        title: const Text('Share only when you leave'),
+        content: const Text(
+          'Meetup keeps your starting point on this phone. Your circle sees a pin only after you move about 150 m or choose Share now.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Not now'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Allow location'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) await _locationController.enable();
   }
 
   Future<void> _end() async {
@@ -187,6 +227,11 @@ class CircleDetailScreenState extends State<CircleDetailScreen> {
                     circle.state == CircleState.scheduled
                 ? const SizedBox.shrink()
                 : CircleLiveSection(circle: circle),
+          ),
+          const SizedBox(height: 24),
+          LocationSharingCard(
+            controller: _locationController,
+            onPrepare: _prepareLocationSharing,
           ),
           const SizedBox(height: 24),
           const Text(

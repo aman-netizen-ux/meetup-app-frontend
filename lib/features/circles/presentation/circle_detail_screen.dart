@@ -6,6 +6,7 @@ import 'circle_detail_screen_state.dart';
 import '../../contacts/domain/repositories/contact_repository.dart';
 import '../../contacts/domain/repositories/share_service.dart';
 import '../domain/repositories/mover_location_permission.dart';
+import '../domain/repositories/device_location_tracker.dart';
 
 class CircleDetailScreen extends StatefulWidget {
   const CircleDetailScreen({
@@ -17,6 +18,7 @@ class CircleDetailScreen extends StatefulWidget {
     required this.shareService,
     required this.moverLocationPermission,
     required this.currentUserId,
+    required this.locationTracker,
   });
 
   final CircleSnapshot initial;
@@ -26,6 +28,7 @@ class CircleDetailScreen extends StatefulWidget {
   final ShareService shareService;
   final MoverLocationPermission moverLocationPermission;
   final String currentUserId;
+  final DeviceLocationTracker locationTracker;
 
   @override
   State<CircleDetailScreen> createState() => CircleDetailScreenState();

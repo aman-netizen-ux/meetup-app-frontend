@@ -9,6 +9,7 @@ import '../features/invitations/presentation/state/pending_invitation_controller
 import '../features/contacts/domain/repositories/contact_repository.dart';
 import '../features/contacts/domain/repositories/share_service.dart';
 import '../features/circles/domain/repositories/mover_location_permission.dart';
+import '../features/circles/domain/repositories/device_location_tracker.dart';
 
 class MeetupApp extends StatelessWidget {
   MeetupApp({
@@ -20,6 +21,7 @@ class MeetupApp extends StatelessWidget {
     required ContactRepository contactRepository,
     required ShareService shareService,
     required MoverLocationPermission moverLocationPermission,
+    required DeviceLocationTracker locationTracker,
   }) : _routes = AppRoutes(
          authController,
          CirclesHomeController(),
@@ -29,6 +31,7 @@ class MeetupApp extends StatelessWidget {
          contactRepository,
          shareService,
          moverLocationPermission,
+         locationTracker,
        );
 
   final AppRoutes _routes;

@@ -6,6 +6,8 @@ import '../../domain/entities/private_journey.dart';
 import '../../domain/entities/travel_role.dart';
 import '../../domain/entities/end_reason.dart';
 import '../../domain/entities/invitation_link.dart';
+import '../../domain/entities/device_location.dart';
+import '../../domain/entities/sharing_trigger.dart';
 import '../../domain/repositories/circle_repository.dart';
 import '../datasources/circle_remote_data_source.dart';
 import '../mappers/circle_mapper.dart';
@@ -93,4 +95,32 @@ class CircleRepositoryImpl implements CircleRepository {
       expiresAt: DateTime.parse(json['expiresAt'] as String),
     );
   }
+
+  @override
+  Future<CircleSnapshot> startLocationSharing(
+    String circleId,
+    SharingTrigger trigger,
+    DeviceLocation location,
+  ) async => mapCircleSnapshot(
+    await _remote.startLocationSharing(circleId, {
+      ..._serializeLocation(location),
+      'trigger': trigger.name,
+    }),
+  );
+
+  @override
+  Future<CircleSnapshot> sendLocation(
+    String circleId,
+    DeviceLocation location,
+  ) async => mapCircleSnapshot(
+    await _remote.sendLocation(circleId, _serializeLocation(location)),
+  );
+
+  Map<String, dynamic> _serializeLocation(DeviceLocation location) => {
+    'consentGranted': true,
+    'latitude': location.latitude,
+    'longitude': location.longitude,
+    'accuracyMeters': location.accuracyMeters,
+    'capturedAt': location.capturedAt.toUtc().toIso8601String(),
+  };
 }

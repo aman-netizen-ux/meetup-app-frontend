@@ -1,0 +1,1 @@
+enum SharingTrigger { departure, manual }

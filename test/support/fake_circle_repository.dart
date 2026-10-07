@@ -10,6 +10,8 @@ import 'package:meetup_app_frontend/features/circles/domain/entities/join_previe
 import 'package:meetup_app_frontend/features/circles/domain/entities/private_journey.dart';
 import 'package:meetup_app_frontend/features/circles/domain/entities/setup_status.dart';
 import 'package:meetup_app_frontend/features/circles/domain/entities/travel_role.dart';
+import 'package:meetup_app_frontend/features/circles/domain/entities/device_location.dart';
+import 'package:meetup_app_frontend/features/circles/domain/entities/sharing_trigger.dart';
 import 'package:meetup_app_frontend/features/circles/domain/repositories/circle_repository.dart';
 
 class FakeCircleRepository implements CircleRepository {
@@ -17,6 +19,9 @@ class FakeCircleRepository implements CircleRepository {
 
   CircleSnapshot snapshot;
   int roleChanges = 0;
+  int sharingStarts = 0;
+  int locationUpdates = 0;
+  SharingTrigger? lastSharingTrigger;
   Completer<CircleSnapshot?> _nextChange = Completer();
 
   void emit(CircleSnapshot value) {
@@ -104,4 +109,24 @@ class FakeCircleRepository implements CircleRepository {
   @override
   Future<InvitationLink> createInvitationLink(String circleId) =>
       throw UnimplementedError();
+
+  @override
+  Future<CircleSnapshot> startLocationSharing(
+    String circleId,
+    SharingTrigger trigger,
+    DeviceLocation location,
+  ) async {
+    sharingStarts++;
+    lastSharingTrigger = trigger;
+    return snapshot;
+  }
+
+  @override
+  Future<CircleSnapshot> sendLocation(
+    String circleId,
+    DeviceLocation location,
+  ) async {
+    locationUpdates++;
+    return snapshot;
+  }
 }

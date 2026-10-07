@@ -6,6 +6,8 @@ import '../entities/private_journey.dart';
 import '../entities/travel_role.dart';
 import '../entities/end_reason.dart';
 import '../entities/invitation_link.dart';
+import '../entities/device_location.dart';
+import '../entities/sharing_trigger.dart';
 
 abstract class CircleRepository {
   Future<List<CircleSummary>> listCircles();
@@ -26,5 +28,14 @@ abstract class CircleRepository {
   Future<CircleSnapshot?> waitForCircleChange(
     String circleId,
     int afterRevision,
+  );
+  Future<CircleSnapshot> startLocationSharing(
+    String circleId,
+    SharingTrigger trigger,
+    DeviceLocation location,
+  );
+  Future<CircleSnapshot> sendLocation(
+    String circleId,
+    DeviceLocation location,
   );
 }

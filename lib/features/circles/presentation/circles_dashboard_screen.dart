@@ -7,6 +7,7 @@ import 'state/circles_home_controller.dart';
 import '../../contacts/domain/repositories/contact_repository.dart';
 import '../../contacts/domain/repositories/share_service.dart';
 import '../domain/repositories/mover_location_permission.dart';
+import '../domain/repositories/device_location_tracker.dart';
 
 class CirclesDashboardScreen extends StatefulWidget {
   const CirclesDashboardScreen({
@@ -20,6 +21,7 @@ class CirclesDashboardScreen extends StatefulWidget {
     required this.shareService,
     required this.moverLocationPermission,
     required this.currentUserId,
+    required this.locationTracker,
   });
 
   final CirclesHomeController controller;
@@ -31,6 +33,7 @@ class CirclesDashboardScreen extends StatefulWidget {
   final ShareService shareService;
   final MoverLocationPermission moverLocationPermission;
   final String currentUserId;
+  final DeviceLocationTracker locationTracker;
 
   @override
   State<CirclesDashboardScreen> createState() => CirclesDashboardScreenState();

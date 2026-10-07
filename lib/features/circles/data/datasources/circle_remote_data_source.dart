@@ -73,4 +73,22 @@ class CircleRemoteDataSource {
         '/v1/circles/${Uri.encodeComponent(circleId)}/invite-links',
         body: const {},
       );
+
+  Future<Map<String, dynamic>> startLocationSharing(
+    String circleId,
+    Map<String, dynamic> body,
+  ) => _http.request(
+    'POST',
+    '/v1/circles/${Uri.encodeComponent(circleId)}/me/sharing/start',
+    body: body,
+  );
+
+  Future<Map<String, dynamic>> sendLocation(
+    String circleId,
+    Map<String, dynamic> body,
+  ) => _http.request(
+    'POST',
+    '/v1/circles/${Uri.encodeComponent(circleId)}/me/locations',
+    body: body,
+  );
 }
