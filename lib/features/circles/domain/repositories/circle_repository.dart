@@ -5,6 +5,7 @@ import '../entities/join_preview.dart';
 import '../entities/private_journey.dart';
 import '../entities/travel_role.dart';
 import '../entities/end_reason.dart';
+import '../entities/invitation_link.dart';
 
 abstract class CircleRepository {
   Future<List<CircleSummary>> listCircles();
@@ -21,4 +22,5 @@ abstract class CircleRepository {
   Future<JoinPreview> previewInvitation(String token);
   Future<CircleSnapshot> acceptInvitation(String token, TravelRole role);
   Future<CircleSnapshot> changeMyRole(String circleId, TravelRole role);
+  Future<InvitationLink> createInvitationLink(String circleId);
 }

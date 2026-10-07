@@ -53,4 +53,11 @@ class CircleRemoteDataSource {
         '/v1/circles/${Uri.encodeComponent(circleId)}/me/role',
         body: {'travelRole': role},
       );
+
+  Future<Map<String, dynamic>> createInvitationLink(String circleId) =>
+      _http.request(
+        'POST',
+        '/v1/circles/${Uri.encodeComponent(circleId)}/invite-links',
+        body: const {},
+      );
 }

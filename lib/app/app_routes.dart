@@ -5,6 +5,7 @@ import '../features/auth/presentation/state/auth_controller.dart';
 import '../features/circles/presentation/state/circles_home_controller.dart';
 import '../features/circles/domain/repositories/circle_repository.dart';
 import '../features/places/domain/repositories/place_search_repository.dart';
+import '../features/invitations/presentation/state/pending_invitation_controller.dart';
 
 class AppRoutes {
   const AppRoutes(
@@ -12,28 +13,25 @@ class AppRoutes {
     this.homeController,
     this.circleRepository,
     this.placeRepository,
+    this.pendingInvitation,
   );
 
   final AuthController authController;
   final CirclesHomeController homeController;
   final CircleRepository circleRepository;
   final PlaceSearchRepository placeRepository;
+  final PendingInvitationController pendingInvitation;
 
   static const home = '/';
 
   Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case home:
-        return MaterialPageRoute<void>(
-          settings: settings,
-          builder: (_) => AuthGate(
-            authController: authController,
-            circlesController: homeController,
-            circleRepository: circleRepository,
-            placeRepository: placeRepository,
-          ),
-        );
+        return _homeRoute(settings);
       default:
+        final uri = Uri.tryParse(settings.name ?? '');
+        if (uri != null) pendingInvitation.open(uri);
+        if (pendingInvitation.value != null) return _homeRoute(settings);
         return MaterialPageRoute<void>(
           settings: settings,
           builder: (_) => const Scaffold(
@@ -42,4 +40,16 @@ class AppRoutes {
         );
     }
   }
+
+  MaterialPageRoute<void> _homeRoute(RouteSettings settings) =>
+      MaterialPageRoute<void>(
+        settings: settings,
+        builder: (_) => AuthGate(
+          authController: authController,
+          circlesController: homeController,
+          circleRepository: circleRepository,
+          placeRepository: placeRepository,
+          pendingInvitation: pendingInvitation,
+        ),
+      );
 }

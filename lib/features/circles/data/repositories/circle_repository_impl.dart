@@ -5,6 +5,7 @@ import '../../domain/entities/join_preview.dart';
 import '../../domain/entities/private_journey.dart';
 import '../../domain/entities/travel_role.dart';
 import '../../domain/entities/end_reason.dart';
+import '../../domain/entities/invitation_link.dart';
 import '../../domain/repositories/circle_repository.dart';
 import '../datasources/circle_remote_data_source.dart';
 import '../mappers/circle_mapper.dart';
@@ -74,4 +75,13 @@ class CircleRepositoryImpl implements CircleRepository {
   @override
   Future<CircleSnapshot> changeMyRole(String circleId, TravelRole role) async =>
       mapCircleSnapshot(await _remote.changeMyRole(circleId, role.name));
+
+  @override
+  Future<InvitationLink> createInvitationLink(String circleId) async {
+    final json = await _remote.createInvitationLink(circleId);
+    return InvitationLink(
+      url: Uri.parse(json['url'] as String),
+      expiresAt: DateTime.parse(json['expiresAt'] as String),
+    );
+  }
 }

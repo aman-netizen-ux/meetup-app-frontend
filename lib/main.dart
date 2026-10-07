@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:app_links/app_links.dart';
 
 import 'app/meetup_app.dart';
 import 'app/setup_required_screen.dart';
@@ -14,6 +15,8 @@ import 'features/auth/presentation/state/auth_controller.dart';
 import 'features/circles/data/datasources/circle_remote_data_source.dart';
 import 'features/circles/data/repositories/circle_repository_impl.dart';
 import 'features/places/data/place_search_repository_impl.dart';
+import 'features/invitations/data/app_link_data_source.dart';
+import 'features/invitations/presentation/state/pending_invitation_controller.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,11 +38,17 @@ Future<void> main() async {
     ProfileRemoteDataSource(http),
   );
   final controller = AuthController(repository)..start();
+  final pendingInvitation = PendingInvitationController();
+  final appLinks = AppLinkDataSource(AppLinks());
+  final initialLink = await appLinks.initialLink();
+  if (initialLink != null) pendingInvitation.open(initialLink);
+  appLinks.links.listen(pendingInvitation.open);
   runApp(
     MeetupApp(
       authController: controller,
       circleRepository: CircleRepositoryImpl(CircleRemoteDataSource(http)),
       placeRepository: PlaceSearchRepositoryImpl(http),
+      pendingInvitation: pendingInvitation,
     ),
   );
 }

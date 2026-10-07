@@ -9,6 +9,8 @@ import 'sign_in_screen.dart';
 import 'state/auth_controller.dart';
 import 'state/auth_state.dart';
 import 'state/auth_status.dart';
+import '../../invitations/presentation/join_circle_screen.dart';
+import '../../invitations/presentation/state/pending_invitation_controller.dart';
 
 class AuthGate extends StatelessWidget {
   const AuthGate({
@@ -17,12 +19,14 @@ class AuthGate extends StatelessWidget {
     required this.circlesController,
     required this.circleRepository,
     required this.placeRepository,
+    required this.pendingInvitation,
   });
 
   final AuthController authController;
   final CirclesHomeController circlesController;
   final CircleRepository circleRepository;
   final PlaceSearchRepository placeRepository;
+  final PendingInvitationController pendingInvitation;
 
   @override
   Widget build(BuildContext context) => ValueListenableBuilder<AuthState>(
@@ -33,12 +37,26 @@ class AuthGate extends StatelessWidget {
       ),
       AuthStatus.signedIn when state.user?.profileCompleted == false =>
         ProfileNameScreen(controller: authController),
-      AuthStatus.signedIn => CirclesDashboardScreen(
-        controller: circlesController,
-        repository: circleRepository,
-        places: placeRepository,
-        displayName: state.user?.displayName ?? '',
-        onSignOut: authController.signOut,
+      AuthStatus.signedIn => ValueListenableBuilder<String?>(
+        valueListenable: pendingInvitation,
+        builder: (context, token, _) => token == null
+            ? CirclesDashboardScreen(
+                controller: circlesController,
+                repository: circleRepository,
+                places: placeRepository,
+                displayName: state.user?.displayName ?? '',
+                onSignOut: authController.signOut,
+              )
+            : JoinCircleScreen(
+                key: ValueKey(token),
+                token: token,
+                repository: circleRepository,
+                onClose: pendingInvitation.clear,
+                onJoined: (_) {
+                  pendingInvitation.clear();
+                  circlesController.load(circleRepository);
+                },
+              ),
       ),
       AuthStatus.failure => Scaffold(
         body: Center(

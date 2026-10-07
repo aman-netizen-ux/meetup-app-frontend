@@ -5,6 +5,7 @@ import '../features/auth/presentation/state/auth_controller.dart';
 import '../features/circles/presentation/state/circles_home_controller.dart';
 import '../features/circles/domain/repositories/circle_repository.dart';
 import '../features/places/domain/repositories/place_search_repository.dart';
+import '../features/invitations/presentation/state/pending_invitation_controller.dart';
 
 class MeetupApp extends StatelessWidget {
   MeetupApp({
@@ -12,11 +13,13 @@ class MeetupApp extends StatelessWidget {
     required AuthController authController,
     required CircleRepository circleRepository,
     required PlaceSearchRepository placeRepository,
+    required PendingInvitationController pendingInvitation,
   }) : _routes = AppRoutes(
          authController,
          CirclesHomeController(),
          circleRepository,
          placeRepository,
+         pendingInvitation,
        );
 
   final AppRoutes _routes;

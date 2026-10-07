@@ -11,7 +11,11 @@ class PlaceSearchRepositoryImpl implements PlaceSearchRepository {
 
   @override
   Future<List<PlaceSuggestion>> search(String query) async {
-    final json = await _http.request('POST', '/v1/places/search', body: {'query': query});
+    final json = await _http.request(
+      'POST',
+      '/v1/places/search',
+      body: {'query': query},
+    );
     return (json['items'] as List<dynamic>)
         .map((value) {
           final item = value as Map<String, dynamic>;

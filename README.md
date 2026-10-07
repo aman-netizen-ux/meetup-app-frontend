@@ -14,7 +14,7 @@ Copy-Item config/app.example.json config/app.local.json
 flutter run --dart-define-from-file=config/app.local.json
 ```
 
-The app shows phone sign-in when configured. After verification, it creates a backend account and asks for a display name before opening the circle dashboard. Circle creation and a destination map picker are present; invitations, routing, and live location are later slices. The API is maintained in the separate [meetup-app-backend](https://github.com/aman-netizen-ux/meetup-app-backend) repository.
+The app shows phone sign-in when configured. After verification, it creates a backend account and asks for a display name before opening the circle dashboard. Circle creation, destination picking, invitation-link creation, and installed-app join previews are present; contacts, routing, and live location are later slices. The API is maintained in the separate [meetup-app-backend](https://github.com/aman-netizen-ux/meetup-app-backend) repository.
 
 ## App structure and API configuration
 
@@ -51,3 +51,7 @@ Keep USB connected during this development run. If the app shows a profile/API r
 The app shows a setup message when the API URL is absent. Do not put service-account credentials in Flutter. Firebase Auth persists the signed-in native session across app restarts. For local Android testing, use your computer's LAN IP in `API_BASE_URL` and bind the Node server to a reachable interface; the debug build permits local HTTP, while release builds should use HTTPS. iOS still needs its own Firebase app configuration and a Mac. Firebase phone sign-in and the backend account handshake have been verified on Android with the configured test number.
 
 Run `dart run tool/api_client_smoke.dart` to check bearer-token handling, invitation preview, independent date/time parsing, and API error mapping against a local mock server.
+
+## Invitation links
+
+Development builds register `meetup://join/<token>` on Android and iOS. Opening a valid link keeps the invitation pending through authentication, then shows a privacy-limited preview and role choice. The app also parses HTTPS `/join/<token>` links. Production store-install continuation needs the final HTTPS domain plus Android App Links and iOS Universal Links association files; track that remaining release work in F-06.
