@@ -11,6 +11,7 @@ import '../domain/entities/travel_role.dart';
 import 'circle_connection_badge.dart';
 import 'circle_detail_screen.dart';
 import 'circle_header_card.dart';
+import 'circle_live_section.dart';
 import 'circle_member_card.dart';
 import 'member_role_card.dart';
 import 'state/circle_connection_status.dart';
@@ -180,8 +181,16 @@ class CircleDetailScreenState extends State<CircleDetailScreen> {
                 : CircleHeaderCard(circle: circle),
           ),
           const SizedBox(height: 24),
+          ValueListenableBuilder<CircleSnapshot?>(
+            valueListenable: _controller.circle,
+            builder: (context, circle, _) => circle == null ||
+                    circle.state == CircleState.scheduled
+                ? const SizedBox.shrink()
+                : CircleLiveSection(circle: circle),
+          ),
+          const SizedBox(height: 24),
           const Text(
-            'People',
+            'Your role',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 8),
@@ -198,12 +207,25 @@ class CircleDetailScreenState extends State<CircleDetailScreen> {
                     ended: circle.state == CircleState.ended,
                     onSelected: (role) => _changeRole(circle, mine, role),
                   ),
-                  ...circle.members
-                      .where((member) => member.userId != widget.currentUserId)
-                      .map((member) => CircleMemberCard(member: member)),
                 ],
               );
             },
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'Journey updates',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(height: 8),
+          ValueListenableBuilder<CircleSnapshot?>(
+            valueListenable: _controller.circle,
+            builder: (context, circle, _) => circle == null
+                ? const SizedBox.shrink()
+                : Column(
+                    children: circle.members
+                        .map((member) => CircleMemberCard(member: member))
+                        .toList(growable: false),
+                  ),
           ),
           const SizedBox(height: 18),
           ValueListenableBuilder<CircleSnapshot?>(

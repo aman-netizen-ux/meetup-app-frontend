@@ -26,7 +26,7 @@ This repository owns the Flutter Android/iOS client: screens, route choice, perm
 
 | ID | Status | Task and acceptance checks | Depends on / backend partner |
 |---|---|---|---|
-| F-09 | TODO | Build the shared Circle screen with map, destination, member positions, current leg/mode, ETA ranges, stale/in-transit indicator, and Here state. Reconnect to a complete snapshot. Never display another member's leave-by time. | F-03, F-05 / B-08 |
+| F-09 | DONE | Built the shared Circle screen with an OSM map, destination and privacy-gated member markers, current leg/mode, ETA ranges, stale/in-transit indicator, and Here state. Revision long polling reconnects with complete snapshots. Shared entities and UI contain no member leave-by field. | F-03, F-05 / B-08 |
 | F-10 | TODO | Implement permission education and platform location permissions. For an active mover, establish a starting point, begin sharing only after departure (~150 m), offer Share now, and stop per-person on arrival or switch to anchor. A scheduled circle must not prompt or track early. | F-02, F-08 / B-09 |
 | F-11 | TODO | Add suggested route display and explicit mover selection, including walking/road/transit legs, no-route recovery, and selected-route changes. Never infer a journey mode silently. | F-09 / B-10 |
 | F-12 | TODO | Implement checkpoint monitoring and adaptive location frequency from device motion, stationary state, and destination proximity. Test background behavior on both platforms and show GPS-loss state without presenting an old point as live. | F-02, F-10, F-11 / B-09, B-11 |
