@@ -11,6 +11,8 @@ import 'state/auth_state.dart';
 import 'state/auth_status.dart';
 import '../../invitations/presentation/join_circle_screen.dart';
 import '../../invitations/presentation/state/pending_invitation_controller.dart';
+import '../../contacts/domain/repositories/contact_repository.dart';
+import '../../contacts/domain/repositories/share_service.dart';
 
 class AuthGate extends StatelessWidget {
   const AuthGate({
@@ -20,6 +22,8 @@ class AuthGate extends StatelessWidget {
     required this.circleRepository,
     required this.placeRepository,
     required this.pendingInvitation,
+    required this.contactRepository,
+    required this.shareService,
   });
 
   final AuthController authController;
@@ -27,6 +31,8 @@ class AuthGate extends StatelessWidget {
   final CircleRepository circleRepository;
   final PlaceSearchRepository placeRepository;
   final PendingInvitationController pendingInvitation;
+  final ContactRepository contactRepository;
+  final ShareService shareService;
 
   @override
   Widget build(BuildContext context) => ValueListenableBuilder<AuthState>(
@@ -46,6 +52,8 @@ class AuthGate extends StatelessWidget {
                 places: placeRepository,
                 displayName: state.user?.displayName ?? '',
                 onSignOut: authController.signOut,
+                contactRepository: contactRepository,
+                shareService: shareService,
               )
             : JoinCircleScreen(
                 key: ValueKey(token),

@@ -6,6 +6,8 @@ import '../features/circles/presentation/state/circles_home_controller.dart';
 import '../features/circles/domain/repositories/circle_repository.dart';
 import '../features/places/domain/repositories/place_search_repository.dart';
 import '../features/invitations/presentation/state/pending_invitation_controller.dart';
+import '../features/contacts/domain/repositories/contact_repository.dart';
+import '../features/contacts/domain/repositories/share_service.dart';
 
 class AppRoutes {
   const AppRoutes(
@@ -14,6 +16,8 @@ class AppRoutes {
     this.circleRepository,
     this.placeRepository,
     this.pendingInvitation,
+    this.contactRepository,
+    this.shareService,
   );
 
   final AuthController authController;
@@ -21,6 +25,8 @@ class AppRoutes {
   final CircleRepository circleRepository;
   final PlaceSearchRepository placeRepository;
   final PendingInvitationController pendingInvitation;
+  final ContactRepository contactRepository;
+  final ShareService shareService;
 
   static const home = '/';
 
@@ -50,6 +56,8 @@ class AppRoutes {
           circleRepository: circleRepository,
           placeRepository: placeRepository,
           pendingInvitation: pendingInvitation,
+          contactRepository: contactRepository,
+          shareService: shareService,
         ),
       );
 }

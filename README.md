@@ -14,7 +14,7 @@ Copy-Item config/app.example.json config/app.local.json
 flutter run --dart-define-from-file=config/app.local.json
 ```
 
-The app shows phone sign-in when configured. After verification, it creates a backend account and asks for a display name before opening the circle dashboard. Circle creation, destination picking, invitation-link creation, and installed-app join previews are present; contacts, routing, and live location are later slices. The API is maintained in the separate [meetup-app-backend](https://github.com/aman-netizen-ux/meetup-app-backend) repository.
+The app shows phone sign-in when configured. After verification, it creates a backend account and asks for a display name before opening the circle dashboard. Circle creation, destination picking, invitation links, installed-app join previews, and contact invitations are present; routing and live location are later slices. The API is maintained in the separate [meetup-app-backend](https://github.com/aman-netizen-ux/meetup-app-backend) repository.
 
 ## App structure and API configuration
 
@@ -55,3 +55,9 @@ Run `dart run tool/api_client_smoke.dart` to check bearer-token handling, invita
 ## Invitation links
 
 Development builds register `meetup://join/<token>` on Android and iOS. Opening a valid link keeps the invitation pending through authentication, then shows a privacy-limited preview and role choice. The app also parses HTTPS `/join/<token>` links. Production store-install continuation needs the final HTTPS domain plus Android App Links and iOS Universal Links association files; track that remaining release work in F-06.
+
+## Contact invitations
+
+The organizer can open **Invite from contacts** on an active or scheduled circle. Android requests `READ_CONTACTS`; iOS uses `NSContactsUsageDescription`. Names remain on the device. The client sends at most 200 normalized phone numbers with ephemeral local IDs to the backend, then removes phone numbers before creating presentation state. Existing users are shown as available to add, with a confirmation that membership remains pending until they choose a role and grant location permission. Nonusers use the operating system share sheet; the app never selects a recipient or sends a message automatically.
+
+The visible app name is **Meetup** on Android and iOS. `com.example.meetup` remains the Android application/package ID used by Firebase.

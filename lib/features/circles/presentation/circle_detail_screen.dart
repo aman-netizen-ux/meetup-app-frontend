@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../domain/entities/circle_snapshot.dart';
 import '../domain/repositories/circle_repository.dart';
 import 'circle_detail_screen_state.dart';
+import '../../contacts/domain/repositories/contact_repository.dart';
+import '../../contacts/domain/repositories/share_service.dart';
 
 class CircleDetailScreen extends StatefulWidget {
   const CircleDetailScreen({
@@ -10,11 +12,15 @@ class CircleDetailScreen extends StatefulWidget {
     required this.initial,
     required this.repository,
     required this.isOrganizer,
+    required this.contactRepository,
+    required this.shareService,
   });
 
   final CircleSnapshot initial;
   final CircleRepository repository;
   final bool isOrganizer;
+  final ContactRepository contactRepository;
+  final ShareService shareService;
 
   @override
   State<CircleDetailScreen> createState() => CircleDetailScreenState();

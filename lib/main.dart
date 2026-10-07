@@ -17,6 +17,10 @@ import 'features/circles/data/repositories/circle_repository_impl.dart';
 import 'features/places/data/place_search_repository_impl.dart';
 import 'features/invitations/data/app_link_data_source.dart';
 import 'features/invitations/presentation/state/pending_invitation_controller.dart';
+import 'features/contacts/data/datasources/contact_book_data_source.dart';
+import 'features/contacts/data/datasources/contact_remote_data_source.dart';
+import 'features/contacts/data/platform/platform_share_service.dart';
+import 'features/contacts/data/repositories/contact_repository_impl.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,6 +53,11 @@ Future<void> main() async {
       circleRepository: CircleRepositoryImpl(CircleRemoteDataSource(http)),
       placeRepository: PlaceSearchRepositoryImpl(http),
       pendingInvitation: pendingInvitation,
+      contactRepository: ContactRepositoryImpl(
+        ContactBookDataSource(),
+        ContactRemoteDataSource(http),
+      ),
+      shareService: const PlatformShareService(),
     ),
   );
 }

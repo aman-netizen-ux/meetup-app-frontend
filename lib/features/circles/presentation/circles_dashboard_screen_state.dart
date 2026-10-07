@@ -36,6 +36,8 @@ class CirclesDashboardScreenState extends State<CirclesDashboardScreen> {
             initial: circle,
             repository: widget.repository,
             isOrganizer: true,
+            contactRepository: widget.contactRepository,
+            shareService: widget.shareService,
           ),
         ),
       );
@@ -53,6 +55,8 @@ class CirclesDashboardScreenState extends State<CirclesDashboardScreen> {
             initial: circle,
             repository: widget.repository,
             isOrganizer: summary.isOrganizer,
+            contactRepository: widget.contactRepository,
+            shareService: widget.shareService,
           ),
         ),
       );

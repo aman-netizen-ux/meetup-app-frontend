@@ -68,7 +68,7 @@ void main() {
 
       await controller.sendCode('+919876543210');
       expect(controller.value.status, AuthStatus.awaitingCode);
-      await controller.verifyCode('123456');
+      await controller.verifyCode('654987');
       expect(controller.value.status, AuthStatus.signedIn);
       expect(controller.value.user?.displayName, 'Priya');
       expect(repository.profileLoads, 1);

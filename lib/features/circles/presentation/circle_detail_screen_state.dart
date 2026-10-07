@@ -7,6 +7,7 @@ import '../domain/entities/circle_state.dart';
 import 'circle_detail_screen.dart';
 import 'state/circle_detail_controller.dart';
 import 'state/circle_detail_action_state.dart';
+import '../../contacts/presentation/contact_invite_screen.dart';
 
 class CircleDetailScreenState extends State<CircleDetailScreen> {
   late final CircleDetailController _controller = CircleDetailController(
@@ -50,6 +51,20 @@ class CircleDetailScreenState extends State<CircleDetailScreen> {
       ),
     );
     if (confirmed == true) await _controller.end();
+  }
+
+  Future<void> _inviteContacts() async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => ContactInviteScreen(
+          circleId: widget.initial.id,
+          contacts: widget.contactRepository,
+          circles: widget.repository,
+          share: widget.shareService,
+        ),
+      ),
+    );
+    if (mounted) await _controller.refresh();
   }
 
   @override
@@ -140,6 +155,12 @@ class CircleDetailScreenState extends State<CircleDetailScreen> {
               ),
               const SizedBox(height: 18),
               if (widget.isOrganizer && circle.state != CircleState.ended) ...[
+                FilledButton.tonalIcon(
+                  onPressed: _inviteContacts,
+                  icon: const Icon(Icons.contacts_rounded),
+                  label: const Text('Invite from contacts'),
+                ),
+                const SizedBox(height: 10),
                 InvitationLinkPanel(
                   circleId: circle.id,
                   controller: _invitationController,

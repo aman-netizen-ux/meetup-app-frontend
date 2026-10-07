@@ -4,7 +4,7 @@ import 'package:meetup_app_frontend/features/invitations/presentation/state/pend
 void main() {
   test('accepts validated custom and HTTPS invitation links', () {
     final controller = PendingInvitationController();
-    const token = 'abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGH';
+    const token = 'abcdefghijklmnopqrstuvwxyz9087654321ABCDEFGH';
 
     controller.open(Uri.parse('meetup://join/$token'));
     expect(controller.value, token);
