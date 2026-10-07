@@ -13,6 +13,7 @@ import '../../invitations/presentation/join_circle_screen.dart';
 import '../../invitations/presentation/state/pending_invitation_controller.dart';
 import '../../contacts/domain/repositories/contact_repository.dart';
 import '../../contacts/domain/repositories/share_service.dart';
+import '../../circles/domain/repositories/mover_location_permission.dart';
 
 class AuthGate extends StatelessWidget {
   const AuthGate({
@@ -24,6 +25,7 @@ class AuthGate extends StatelessWidget {
     required this.pendingInvitation,
     required this.contactRepository,
     required this.shareService,
+    required this.moverLocationPermission,
   });
 
   final AuthController authController;
@@ -33,6 +35,7 @@ class AuthGate extends StatelessWidget {
   final PendingInvitationController pendingInvitation;
   final ContactRepository contactRepository;
   final ShareService shareService;
+  final MoverLocationPermission moverLocationPermission;
 
   @override
   Widget build(BuildContext context) => ValueListenableBuilder<AuthState>(
@@ -54,6 +57,8 @@ class AuthGate extends StatelessWidget {
                 onSignOut: authController.signOut,
                 contactRepository: contactRepository,
                 shareService: shareService,
+                moverLocationPermission: moverLocationPermission,
+                currentUserId: state.user!.id,
               )
             : JoinCircleScreen(
                 key: ValueKey(token),

@@ -8,6 +8,7 @@ import '../features/places/domain/repositories/place_search_repository.dart';
 import '../features/invitations/presentation/state/pending_invitation_controller.dart';
 import '../features/contacts/domain/repositories/contact_repository.dart';
 import '../features/contacts/domain/repositories/share_service.dart';
+import '../features/circles/domain/repositories/mover_location_permission.dart';
 
 class AppRoutes {
   const AppRoutes(
@@ -18,6 +19,7 @@ class AppRoutes {
     this.pendingInvitation,
     this.contactRepository,
     this.shareService,
+    this.moverLocationPermission,
   );
 
   final AuthController authController;
@@ -27,6 +29,7 @@ class AppRoutes {
   final PendingInvitationController pendingInvitation;
   final ContactRepository contactRepository;
   final ShareService shareService;
+  final MoverLocationPermission moverLocationPermission;
 
   static const home = '/';
 
@@ -58,6 +61,7 @@ class AppRoutes {
           pendingInvitation: pendingInvitation,
           contactRepository: contactRepository,
           shareService: shareService,
+          moverLocationPermission: moverLocationPermission,
         ),
       );
 }

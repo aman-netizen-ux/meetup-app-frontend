@@ -25,6 +25,8 @@ class JsonHttpClient {
     String path, {
     Map<String, dynamic>? body,
     bool requiresAuth = true,
+    bool allowEmpty = false,
+    Duration timeout = _requestTimeout,
   }) async {
     try {
       String? token;
@@ -41,18 +43,24 @@ class JsonHttpClient {
 
       final request = await _httpClient
           .openUrl(method, _baseUri.resolve(path))
-          .timeout(_requestTimeout);
+          .timeout(timeout);
       request.headers.contentType = ContentType.json;
       if (token != null) {
         request.headers.set(HttpHeaders.authorizationHeader, 'Bearer $token');
       }
       if (body != null) request.write(jsonEncode(body));
 
-      final response = await request.close().timeout(_requestTimeout);
+      final response = await request.close().timeout(timeout);
       final responseText = await utf8.decoder
           .bind(response)
           .join()
-          .timeout(_requestTimeout);
+          .timeout(timeout);
+      if (allowEmpty &&
+          response.statusCode >= 200 &&
+          response.statusCode < 300 &&
+          responseText.isEmpty) {
+        return const {};
+      }
       Map<String, dynamic> json;
       try {
         json = jsonDecode(responseText) as Map<String, dynamic>;

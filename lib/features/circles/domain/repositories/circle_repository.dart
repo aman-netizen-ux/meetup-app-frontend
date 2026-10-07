@@ -23,4 +23,8 @@ abstract class CircleRepository {
   Future<CircleSnapshot> acceptInvitation(String token, TravelRole role);
   Future<CircleSnapshot> changeMyRole(String circleId, TravelRole role);
   Future<InvitationLink> createInvitationLink(String circleId);
+  Future<CircleSnapshot?> waitForCircleChange(
+    String circleId,
+    int afterRevision,
+  );
 }

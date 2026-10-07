@@ -4,6 +4,8 @@
 <dict>
 	<key>NSContactsUsageDescription</key>
 	<string>Meetup uses your contacts to show who is already on the app and let you share circle invitations.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Meetup uses your location after you choose mover so your circle can follow your journey.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>

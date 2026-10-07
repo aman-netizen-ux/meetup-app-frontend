@@ -61,3 +61,9 @@ Development builds register `meetup://join/<token>` on Android and iOS. Opening 
 The organizer can open **Invite from contacts** on an active or scheduled circle. Android requests `READ_CONTACTS`; iOS uses `NSContactsUsageDescription`. Names remain on the device. The client sends at most 200 normalized phone numbers with ephemeral local IDs to the backend, then removes phone numbers before creating presentation state. Existing users are shown as available to add, with a confirmation that membership remains pending until they choose a role and grant location permission. Nonusers use the operating system share sheet; the app never selects a recipient or sends a message automatically.
 
 The visible app name is **Meetup** on Android and iOS. `com.example.meetup` remains the Android application/package ID used by Firebase.
+
+## Roles and live updates
+
+Circle details show every member and an inline role card for the signed-in user. Directly added contacts remain pending until they confirm mover or anchor themselves. An active user switching to mover sees an education dialog before Android/iOS foreground location permission; scheduled circles defer that prompt. Choosing anchor stops future location updates, while the backend can retain an already shared point as frozen.
+
+While circle details are open, the client long-polls `GET /v1/circles/:id/events` with its last revision. Every update is a complete authorized snapshot, so reconnect does not replay or merge partial events. Header, people/role, organizer actions, and connection status use separate `ValueListenableBuilder` boundaries.

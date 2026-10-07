@@ -38,6 +38,8 @@ class CirclesDashboardScreenState extends State<CirclesDashboardScreen> {
             isOrganizer: true,
             contactRepository: widget.contactRepository,
             shareService: widget.shareService,
+            moverLocationPermission: widget.moverLocationPermission,
+            currentUserId: widget.currentUserId,
           ),
         ),
       );
@@ -57,6 +59,8 @@ class CirclesDashboardScreenState extends State<CirclesDashboardScreen> {
             isOrganizer: summary.isOrganizer,
             contactRepository: widget.contactRepository,
             shareService: widget.shareService,
+            moverLocationPermission: widget.moverLocationPermission,
+            currentUserId: widget.currentUserId,
           ),
         ),
       );

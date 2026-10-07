@@ -29,6 +29,15 @@ class CircleRepositoryImpl implements CircleRepository {
       mapCircleSnapshot(await _remote.getCircle(circleId));
 
   @override
+  Future<CircleSnapshot?> waitForCircleChange(
+    String circleId,
+    int afterRevision,
+  ) async {
+    final json = await _remote.waitForCircleChange(circleId, afterRevision);
+    return json == null ? null : mapCircleSnapshot(json);
+  }
+
+  @override
   Future<PrivateJourney> getMyJourney(String circleId) async =>
       mapPrivateJourney(await _remote.getMyJourney(circleId));
 

@@ -6,6 +6,7 @@ import 'circles_dashboard_screen_state.dart';
 import 'state/circles_home_controller.dart';
 import '../../contacts/domain/repositories/contact_repository.dart';
 import '../../contacts/domain/repositories/share_service.dart';
+import '../domain/repositories/mover_location_permission.dart';
 
 class CirclesDashboardScreen extends StatefulWidget {
   const CirclesDashboardScreen({
@@ -17,6 +18,8 @@ class CirclesDashboardScreen extends StatefulWidget {
     required this.onSignOut,
     required this.contactRepository,
     required this.shareService,
+    required this.moverLocationPermission,
+    required this.currentUserId,
   });
 
   final CirclesHomeController controller;
@@ -26,6 +29,8 @@ class CirclesDashboardScreen extends StatefulWidget {
   final VoidCallback onSignOut;
   final ContactRepository contactRepository;
   final ShareService shareService;
+  final MoverLocationPermission moverLocationPermission;
+  final String currentUserId;
 
   @override
   State<CirclesDashboardScreen> createState() => CirclesDashboardScreenState();

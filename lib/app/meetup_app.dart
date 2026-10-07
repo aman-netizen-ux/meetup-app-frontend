@@ -8,6 +8,7 @@ import '../features/places/domain/repositories/place_search_repository.dart';
 import '../features/invitations/presentation/state/pending_invitation_controller.dart';
 import '../features/contacts/domain/repositories/contact_repository.dart';
 import '../features/contacts/domain/repositories/share_service.dart';
+import '../features/circles/domain/repositories/mover_location_permission.dart';
 
 class MeetupApp extends StatelessWidget {
   MeetupApp({
@@ -18,6 +19,7 @@ class MeetupApp extends StatelessWidget {
     required PendingInvitationController pendingInvitation,
     required ContactRepository contactRepository,
     required ShareService shareService,
+    required MoverLocationPermission moverLocationPermission,
   }) : _routes = AppRoutes(
          authController,
          CirclesHomeController(),
@@ -26,6 +28,7 @@ class MeetupApp extends StatelessWidget {
          pendingInvitation,
          contactRepository,
          shareService,
+         moverLocationPermission,
        );
 
   final AppRoutes _routes;

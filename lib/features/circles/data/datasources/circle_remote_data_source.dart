@@ -12,6 +12,19 @@ class CircleRemoteDataSource {
   Future<Map<String, dynamic>> getCircle(String circleId) =>
       _http.request('GET', '/v1/circles/${Uri.encodeComponent(circleId)}');
 
+  Future<Map<String, dynamic>?> waitForCircleChange(
+    String circleId,
+    int afterRevision,
+  ) async {
+    final json = await _http.request(
+      'GET',
+      '/v1/circles/${Uri.encodeComponent(circleId)}/events?afterRevision=$afterRevision',
+      allowEmpty: true,
+      timeout: const Duration(seconds: 35),
+    );
+    return json.isEmpty ? null : json;
+  }
+
   Future<Map<String, dynamic>> getMyJourney(String circleId) =>
       _http.request('GET', '/v1/circles/${Uri.encodeComponent(circleId)}/me');
 

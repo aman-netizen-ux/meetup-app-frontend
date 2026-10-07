@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
 
+import '../../contacts/presentation/contact_invite_screen.dart';
 import '../../invitations/presentation/invitation_link_panel.dart';
 import '../../invitations/presentation/state/invitation_link_controller.dart';
+import '../domain/entities/circle_member.dart';
 import '../domain/entities/circle_snapshot.dart';
 import '../domain/entities/circle_state.dart';
+import '../domain/entities/setup_status.dart';
+import '../domain/entities/travel_role.dart';
+import 'circle_connection_badge.dart';
 import 'circle_detail_screen.dart';
-import 'state/circle_detail_controller.dart';
+import 'circle_header_card.dart';
+import 'circle_member_card.dart';
+import 'member_role_card.dart';
+import 'state/circle_connection_status.dart';
 import 'state/circle_detail_action_state.dart';
-import '../../contacts/presentation/contact_invite_screen.dart';
+import 'state/circle_detail_controller.dart';
+import 'state/member_role_controller.dart';
 
 class CircleDetailScreenState extends State<CircleDetailScreen> {
   late final CircleDetailController _controller = CircleDetailController(
@@ -16,18 +25,38 @@ class CircleDetailScreenState extends State<CircleDetailScreen> {
   );
   late final InvitationLinkController _invitationController =
       InvitationLinkController(widget.repository);
+  late final MemberRoleController _roleController = MemberRoleController(
+    repository: widget.repository,
+    permission: widget.moverLocationPermission,
+    circleId: widget.initial.id,
+    userId: widget.currentUserId,
+    initial: _myMember(widget.initial),
+  );
+
+  CircleMember _myMember(CircleSnapshot circle) => circle.members.firstWhere(
+    (member) => member.userId == widget.currentUserId,
+  );
 
   @override
   void initState() {
     super.initState();
+    _controller.circle.addListener(_syncMyRole);
     _controller.refresh();
+    _controller.startLiveUpdates();
   }
 
   @override
   void dispose() {
+    _controller.circle.removeListener(_syncMyRole);
     _controller.dispose();
     _invitationController.dispose();
+    _roleController.dispose();
     super.dispose();
+  }
+
+  void _syncMyRole() {
+    final circle = _controller.circle.value;
+    if (circle != null) _roleController.sync(_myMember(circle));
   }
 
   Future<void> _end() async {
@@ -67,143 +96,177 @@ class CircleDetailScreenState extends State<CircleDetailScreen> {
     if (mounted) await _controller.refresh();
   }
 
-  @override
-  Widget build(BuildContext context) => ValueListenableBuilder<CircleSnapshot?>(
-    valueListenable: _controller.circle,
-    builder: (context, circle, _) {
-      if (circle == null) {
-        return const Scaffold(body: Center(child: CircularProgressIndicator()));
-      }
-      final stateLabel = switch (circle.state) {
-        CircleState.active => 'Live circle',
-        CircleState.scheduled => 'Scheduled',
-        CircleState.ended => 'Ended',
-      };
-      final when = [
-        if (circle.meetupDate != null) circle.meetupDate!,
-        if (circle.meetupTime != null) circle.meetupTime!,
-      ].join(' · ');
-      return Scaffold(
-        backgroundColor: const Color(0xFFF7F4EE),
-        appBar: AppBar(
-          title: const Text('Circle details'),
-          backgroundColor: const Color(0xFFF7F4EE),
+  Future<void> _changeRole(
+    CircleSnapshot circle,
+    CircleMember member,
+    TravelRole role,
+  ) async {
+    if (member.setupStatus == SetupStatus.ready && member.travelRole == role) {
+      return;
+    }
+    final requestLocation =
+        role == TravelRole.mover &&
+        circle.state == CircleState.active &&
+        (member.setupStatus == SetupStatus.pending ||
+            member.travelRole != TravelRole.mover);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        icon: Icon(
+          role == TravelRole.mover
+              ? Icons.directions_walk_rounded
+              : Icons.home_work_rounded,
         ),
-        body: RefreshIndicator(
-          onRefresh: _controller.refresh,
-          child: ListView(
-            padding: const EdgeInsets.all(22),
-            children: [
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF17283E),
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      stateLabel.toUpperCase(),
-                      style: const TextStyle(
-                        color: Color(0xFF68D7C9),
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 1.5,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      circle.destination.label,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 26,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 18),
-                    Text(
-                      when.isEmpty
-                          ? 'Starting now'
-                          : '$when  ·  ${circle.timeZone}',
-                      style: const TextStyle(color: Color(0xFFC7D7E4)),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'People',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
-              ),
-              const SizedBox(height: 8),
-              ...circle.members.map(
-                (member) => Card(
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      child: Text(
-                        member.displayName.isEmpty
-                            ? '?'
-                            : member.displayName[0].toUpperCase(),
-                      ),
-                    ),
-                    title: Text(member.displayName),
-                    subtitle: Text(
-                      member.isOrganizer ? 'Organizer' : member.travelRole.name,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 18),
-              if (widget.isOrganizer && circle.state != CircleState.ended) ...[
-                FilledButton.tonalIcon(
-                  onPressed: _inviteContacts,
-                  icon: const Icon(Icons.contacts_rounded),
-                  label: const Text('Invite from contacts'),
-                ),
-                const SizedBox(height: 10),
-                InvitationLinkPanel(
-                  circleId: circle.id,
-                  controller: _invitationController,
-                ),
-                const SizedBox(height: 10),
-              ],
-              ValueListenableBuilder<CircleDetailActionState>(
-                valueListenable: _controller.action,
-                builder: (context, action, _) => Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (action.error != null)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: Text(
-                          action.error!,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.error,
-                          ),
-                        ),
-                      ),
-                    if (widget.isOrganizer && circle.state != CircleState.ended)
-                      OutlinedButton.icon(
-                        onPressed: action.busy ? null : _end,
-                        icon: action.busy
-                            ? const SizedBox.square(
-                                dimension: 18,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Icon(Icons.stop_circle_outlined),
-                        label: Text(
-                          action.busy ? 'Ending circle…' : 'End circle',
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ],
+        title: Text(
+          member.setupStatus == SetupStatus.pending
+              ? 'Finish joining as ${role.name}?'
+              : 'Switch to ${role.name}?',
+        ),
+        content: Text(
+          role == TravelRole.mover
+              ? requestLocation
+                    ? 'Android will ask for location access next. Meetup will not share a position until the later departure or Share now step.'
+                    : 'Your circle will show you as a mover. Location is requested only when this circle becomes active.'
+              : 'Meetup will stop future location updates. Your last shared point can remain frozen for the circle.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Not now'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Continue'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    final updated = await _roleController.change(
+      role,
+      requestLocation: requestLocation,
+    );
+    if (updated != null) _controller.apply(updated);
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    backgroundColor: const Color(0xFFF7F4EE),
+    appBar: AppBar(
+      title: const Text('Circle details'),
+      backgroundColor: const Color(0xFFF7F4EE),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.only(right: 12),
+          child: Center(
+            child: ValueListenableBuilder<CircleConnectionStatus>(
+              valueListenable: _controller.connection,
+              builder: (context, status, _) =>
+                  CircleConnectionBadge(status: status),
+            ),
           ),
         ),
-      );
-    },
+      ],
+    ),
+    body: RefreshIndicator(
+      onRefresh: _controller.refresh,
+      child: ListView(
+        padding: const EdgeInsets.all(22),
+        children: [
+          ValueListenableBuilder<CircleSnapshot?>(
+            valueListenable: _controller.circle,
+            builder: (context, circle, _) => circle == null
+                ? const Center(child: CircularProgressIndicator())
+                : CircleHeaderCard(circle: circle),
+          ),
+          const SizedBox(height: 24),
+          const Text(
+            'People',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(height: 8),
+          ValueListenableBuilder<CircleSnapshot?>(
+            valueListenable: _controller.circle,
+            builder: (context, circle, _) {
+              if (circle == null) return const SizedBox.shrink();
+              final mine = _myMember(circle);
+              return Column(
+                children: [
+                  MemberRoleCard(
+                    controller: _roleController,
+                    privatePlace: circle.isPrivatePlace,
+                    ended: circle.state == CircleState.ended,
+                    onSelected: (role) => _changeRole(circle, mine, role),
+                  ),
+                  ...circle.members
+                      .where((member) => member.userId != widget.currentUserId)
+                      .map((member) => CircleMemberCard(member: member)),
+                ],
+              );
+            },
+          ),
+          const SizedBox(height: 18),
+          ValueListenableBuilder<CircleSnapshot?>(
+            valueListenable: _controller.circle,
+            builder: (context, circle, _) {
+              if (circle == null) return const SizedBox.shrink();
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (widget.isOrganizer &&
+                      circle.state != CircleState.ended) ...[
+                    FilledButton.tonalIcon(
+                      onPressed: _inviteContacts,
+                      icon: const Icon(Icons.contacts_rounded),
+                      label: const Text('Invite from contacts'),
+                    ),
+                    const SizedBox(height: 10),
+                    InvitationLinkPanel(
+                      circleId: circle.id,
+                      controller: _invitationController,
+                    ),
+                    const SizedBox(height: 10),
+                  ],
+                  ValueListenableBuilder<CircleDetailActionState>(
+                    valueListenable: _controller.action,
+                    builder: (context, action, _) => Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        if (action.error != null)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: Text(
+                              action.error!,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.error,
+                              ),
+                            ),
+                          ),
+                        if (widget.isOrganizer &&
+                            circle.state != CircleState.ended)
+                          OutlinedButton.icon(
+                            onPressed: action.busy ? null : _end,
+                            icon: action.busy
+                                ? const SizedBox.square(
+                                    dimension: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(Icons.stop_circle_outlined),
+                            label: Text(
+                              action.busy ? 'Ending circle…' : 'End circle',
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    ),
   );
 }
