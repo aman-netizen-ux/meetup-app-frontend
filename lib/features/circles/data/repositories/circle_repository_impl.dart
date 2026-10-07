@@ -11,6 +11,8 @@ import '../../domain/entities/sharing_trigger.dart';
 import '../../domain/repositories/circle_repository.dart';
 import '../datasources/circle_remote_data_source.dart';
 import '../mappers/circle_mapper.dart';
+import '../../domain/entities/journey_route_option.dart';
+import '../mappers/journey_route_mapper.dart';
 
 /// Converts wire JSON into domain entities behind the repository port.
 class CircleRepositoryImpl implements CircleRepository {
@@ -123,4 +125,26 @@ class CircleRepositoryImpl implements CircleRepository {
     'accuracyMeters': location.accuracyMeters,
     'capturedAt': location.capturedAt.toUtc().toIso8601String(),
   };
+
+  @override
+  Future<List<JourneyRouteOption>> getRouteOptions(String circleId) async {
+    final json = await _remote.getRouteOptions(circleId);
+    return (json['items'] as List<dynamic>)
+        .map((value) => mapJourneyRouteOption(value as Map<String, dynamic>))
+        .toList(growable: false);
+  }
+
+  @override
+  Future<JourneyRouteOption?> getSelectedRoute(String circleId) async {
+    final json = await _remote.getSelectedRoute(circleId);
+    return json == null ? null : mapJourneyRouteOption(json);
+  }
+
+  @override
+  Future<JourneyRouteOption> selectRoute(
+    String circleId,
+    String optionId,
+  ) async => mapJourneyRouteOption(
+    await _remote.selectRoute(circleId, optionId),
+  );
 }

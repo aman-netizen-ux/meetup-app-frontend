@@ -67,3 +67,7 @@ The visible app name is **Meetup** on Android and iOS. `com.example.meetup` rema
 Circle details show every member and an inline role card for the signed-in user. Directly added contacts remain pending until they confirm mover or anchor themselves. An active user switching to mover sees an education dialog before Android/iOS foreground location permission; scheduled circles defer that prompt. Choosing anchor stops future location updates, while the backend can retain an already shared point as frozen.
 
 While circle details are open, the client long-polls `GET /v1/circles/:id/events` with its last revision. Every update is a complete authorized snapshot, so reconnect does not replay or merge partial events. Header, people/role, organizer actions, and connection status use separate `ValueListenableBuilder` boundaries.
+
+## Route selection
+
+After an Active ready mover starts public location sharing, circle details load short-lived server-owned walking, road, and estimated public-transport options. Nothing is inferred from device motion: the mover must tap a route. The chosen route persists on the backend, its geometry appears on the live map, and its leg summary remains visible while another option can be selected. Provider failures and empty results show an inline retry without stopping location sharing.

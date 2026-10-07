@@ -4,13 +4,16 @@ import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../domain/entities/circle_snapshot.dart';
+import '../domain/entities/journey_route_option.dart';
+import '../domain/polyline_decoder.dart';
 import 'destination_map_marker.dart';
 import 'member_map_marker.dart';
 
 class LiveCircleMap extends StatelessWidget {
-  const LiveCircleMap({super.key, required this.circle});
+  const LiveCircleMap({super.key, required this.circle, this.selectedRoute});
 
   final CircleSnapshot circle;
+  final JourneyRouteOption? selectedRoute;
 
   @override
   Widget build(BuildContext context) {
@@ -21,8 +24,13 @@ class LiveCircleMap extends StatelessWidget {
     final visibleMembers = circle.members
         .where((member) => member.pin != null)
         .toList(growable: false);
+    final routePoints = const PolylineDecoder()
+        .decode(selectedRoute?.encodedPolyline, selectedRoute?.polylinePrecision)
+        .map((point) => LatLng(point.latitude, point.longitude))
+        .toList(growable: false);
     final points = [
       destination,
+      ...routePoints,
       ...visibleMembers.map(
         (member) => LatLng(member.pin!.latitude, member.pin!.longitude),
       ),
@@ -64,6 +72,18 @@ class LiveCircleMap extends StatelessWidget {
                 urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 userAgentPackageName: 'com.example.meetup',
               ),
+              if (routePoints.length > 1)
+                PolylineLayer(
+                  polylines: [
+                    Polyline(
+                      points: routePoints,
+                      color: const Color(0xFF168C83),
+                      strokeWidth: 5,
+                      borderColor: Colors.white,
+                      borderStrokeWidth: 2,
+                    ),
+                  ],
+                ),
               MarkerLayer(
                 markers: [
                   Marker(

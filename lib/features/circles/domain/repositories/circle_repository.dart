@@ -8,6 +8,7 @@ import '../entities/end_reason.dart';
 import '../entities/invitation_link.dart';
 import '../entities/device_location.dart';
 import '../entities/sharing_trigger.dart';
+import '../entities/journey_route_option.dart';
 
 abstract class CircleRepository {
   Future<List<CircleSummary>> listCircles();
@@ -38,4 +39,7 @@ abstract class CircleRepository {
     String circleId,
     DeviceLocation location,
   );
+  Future<List<JourneyRouteOption>> getRouteOptions(String circleId);
+  Future<JourneyRouteOption?> getSelectedRoute(String circleId);
+  Future<JourneyRouteOption> selectRoute(String circleId, String optionId);
 }

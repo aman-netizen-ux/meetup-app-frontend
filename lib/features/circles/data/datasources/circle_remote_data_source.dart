@@ -91,4 +91,28 @@ class CircleRemoteDataSource {
     '/v1/circles/${Uri.encodeComponent(circleId)}/me/locations',
     body: body,
   );
+
+  Future<Map<String, dynamic>> getRouteOptions(String circleId) =>
+      _http.request(
+        'GET',
+        '/v1/circles/${Uri.encodeComponent(circleId)}/me/route-options',
+      );
+
+  Future<Map<String, dynamic>?> getSelectedRoute(String circleId) async {
+    final json = await _http.request(
+      'GET',
+      '/v1/circles/${Uri.encodeComponent(circleId)}/me/selected-route',
+      allowEmpty: true,
+    );
+    return json.isEmpty ? null : json;
+  }
+
+  Future<Map<String, dynamic>> selectRoute(
+    String circleId,
+    String optionId,
+  ) => _http.request(
+    'PUT',
+    '/v1/circles/${Uri.encodeComponent(circleId)}/me/selected-route',
+    body: {'routeOptionId': optionId},
+  );
 }

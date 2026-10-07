@@ -20,6 +20,9 @@ import 'state/circle_detail_action_state.dart';
 import 'state/circle_detail_controller.dart';
 import 'state/member_role_controller.dart';
 import 'state/location_sharing_controller.dart';
+import 'state/route_selection_controller.dart';
+import 'state/route_selection_state.dart';
+import 'route_selection_card.dart';
 
 class CircleDetailScreenState extends State<CircleDetailScreen> {
   late final CircleDetailController _controller = CircleDetailController(
@@ -44,6 +47,12 @@ class CircleDetailScreenState extends State<CircleDetailScreen> {
         userId: widget.currentUserId,
         onSnapshot: _controller.apply,
       );
+  late final RouteSelectionController _routeController =
+      RouteSelectionController(
+        repository: widget.repository,
+        circleId: widget.initial.id,
+        userId: widget.currentUserId,
+      );
 
   CircleMember _myMember(CircleSnapshot circle) => circle.members.firstWhere(
     (member) => member.userId == widget.currentUserId,
@@ -54,6 +63,7 @@ class CircleDetailScreenState extends State<CircleDetailScreen> {
     super.initState();
     _controller.circle.addListener(_syncMyRole);
     _locationController.sync(widget.initial);
+    _routeController.sync(widget.initial);
     _controller.refresh();
     _controller.startLiveUpdates();
   }
@@ -65,6 +75,7 @@ class CircleDetailScreenState extends State<CircleDetailScreen> {
     _invitationController.dispose();
     _roleController.dispose();
     _locationController.dispose();
+    _routeController.dispose();
     super.dispose();
   }
 
@@ -73,6 +84,7 @@ class CircleDetailScreenState extends State<CircleDetailScreen> {
     if (circle != null) {
       _roleController.sync(_myMember(circle));
       _locationController.sync(circle);
+      _routeController.sync(circle);
     }
   }
 
@@ -223,16 +235,26 @@ class CircleDetailScreenState extends State<CircleDetailScreen> {
           const SizedBox(height: 24),
           ValueListenableBuilder<CircleSnapshot?>(
             valueListenable: _controller.circle,
-            builder: (context, circle, _) => circle == null ||
-                    circle.state == CircleState.scheduled
-                ? const SizedBox.shrink()
-                : CircleLiveSection(circle: circle),
+            builder: (context, circle, _) {
+              if (circle == null || circle.state == CircleState.scheduled) {
+                return const SizedBox.shrink();
+              }
+              return ValueListenableBuilder<RouteSelectionState>(
+                valueListenable: _routeController,
+                builder: (context, routes, _) => CircleLiveSection(
+                  circle: circle,
+                  selectedRoute: routes.selected,
+                ),
+              );
+            },
           ),
           const SizedBox(height: 24),
           LocationSharingCard(
             controller: _locationController,
             onPrepare: _prepareLocationSharing,
           ),
+          const SizedBox(height: 16),
+          RouteSelectionCard(controller: _routeController),
           const SizedBox(height: 24),
           const Text(
             'Your role',

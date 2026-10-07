@@ -12,6 +12,7 @@ import 'package:meetup_app_frontend/features/circles/domain/entities/setup_statu
 import 'package:meetup_app_frontend/features/circles/domain/entities/travel_role.dart';
 import 'package:meetup_app_frontend/features/circles/domain/entities/device_location.dart';
 import 'package:meetup_app_frontend/features/circles/domain/entities/sharing_trigger.dart';
+import 'package:meetup_app_frontend/features/circles/domain/entities/journey_route_option.dart';
 import 'package:meetup_app_frontend/features/circles/domain/repositories/circle_repository.dart';
 
 class FakeCircleRepository implements CircleRepository {
@@ -21,6 +22,8 @@ class FakeCircleRepository implements CircleRepository {
   int roleChanges = 0;
   int sharingStarts = 0;
   int locationUpdates = 0;
+  List<JourneyRouteOption> routeOptions = const [];
+  JourneyRouteOption? selectedRoute;
   SharingTrigger? lastSharingTrigger;
   Completer<CircleSnapshot?> _nextChange = Completer();
 
@@ -128,5 +131,22 @@ class FakeCircleRepository implements CircleRepository {
   ) async {
     locationUpdates++;
     return snapshot;
+  }
+
+  @override
+  Future<List<JourneyRouteOption>> getRouteOptions(String circleId) async =>
+      routeOptions;
+
+  @override
+  Future<JourneyRouteOption?> getSelectedRoute(String circleId) async =>
+      selectedRoute;
+
+  @override
+  Future<JourneyRouteOption> selectRoute(
+    String circleId,
+    String optionId,
+  ) async {
+    selectedRoute = routeOptions.firstWhere((option) => option.id == optionId);
+    return selectedRoute!;
   }
 }

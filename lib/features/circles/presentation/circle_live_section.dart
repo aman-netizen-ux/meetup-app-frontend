@@ -2,12 +2,18 @@ import 'package:flutter/material.dart';
 
 import '../domain/entities/circle_snapshot.dart';
 import '../domain/entities/circle_state.dart';
+import '../domain/entities/journey_route_option.dart';
 import 'live_circle_map.dart';
 
 class CircleLiveSection extends StatelessWidget {
-  const CircleLiveSection({super.key, required this.circle});
+  const CircleLiveSection({
+    super.key,
+    required this.circle,
+    this.selectedRoute,
+  });
 
   final CircleSnapshot circle;
+  final JourneyRouteOption? selectedRoute;
 
   @override
   Widget build(BuildContext context) => Column(
@@ -37,7 +43,7 @@ class CircleLiveSection extends StatelessWidget {
         ],
       ),
       const SizedBox(height: 10),
-      LiveCircleMap(circle: circle),
+      LiveCircleMap(circle: circle, selectedRoute: selectedRoute),
       const SizedBox(height: 10),
       const Row(
         children: [

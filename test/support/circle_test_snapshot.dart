@@ -11,6 +11,7 @@ CircleSnapshot circleTestSnapshot({
   int revision = 0,
   SetupStatus setupStatus = SetupStatus.pending,
   TravelRole role = TravelRole.mover,
+  MemberPresence presence = MemberPresence.notSharing,
 }) => CircleSnapshot(
   id: 'circle-1',
   organizerId: 'user-1',
@@ -29,7 +30,7 @@ CircleSnapshot circleTestSnapshot({
       isOrganizer: true,
       travelRole: role,
       setupStatus: setupStatus,
-      presence: MemberPresence.notSharing,
+      presence: presence,
     ),
   ],
 );
