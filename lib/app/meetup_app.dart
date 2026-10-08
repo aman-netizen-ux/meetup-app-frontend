@@ -10,6 +10,8 @@ import '../features/contacts/domain/repositories/contact_repository.dart';
 import '../features/contacts/domain/repositories/share_service.dart';
 import '../features/circles/domain/repositories/mover_location_permission.dart';
 import '../features/circles/domain/repositories/device_location_tracker.dart';
+import '../features/notifications/presentation/push_message_listener.dart';
+import '../features/notifications/presentation/state/push_message_controller.dart';
 
 class MeetupApp extends StatelessWidget {
   MeetupApp({
@@ -22,6 +24,7 @@ class MeetupApp extends StatelessWidget {
     required ShareService shareService,
     required MoverLocationPermission moverLocationPermission,
     required DeviceLocationTracker locationTracker,
+    required this.pushMessages,
   }) : _routes = AppRoutes(
          authController,
          CirclesHomeController(),
@@ -35,6 +38,7 @@ class MeetupApp extends StatelessWidget {
        );
 
   final AppRoutes _routes;
+  final PushMessageController pushMessages;
 
   @override
   Widget build(BuildContext context) => MaterialApp(
@@ -60,5 +64,9 @@ class MeetupApp extends StatelessWidget {
     ),
     initialRoute: AppRoutes.home,
     onGenerateRoute: _routes.onGenerateRoute,
+    builder: (context, child) => PushMessageListener(
+      controller: pushMessages,
+      child: child ?? const SizedBox.shrink(),
+    ),
   );
 }

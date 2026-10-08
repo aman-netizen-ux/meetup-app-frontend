@@ -146,6 +146,30 @@ class CircleDetailScreenState extends State<CircleDetailScreen> {
     if (confirmed == true) await _controller.end();
   }
 
+  Future<void> _arrive() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        icon: const Icon(Icons.location_on_rounded, color: Color(0xFF168C83)),
+        title: const Text('Mark yourself as here?'),
+        content: const Text(
+          'Location sharing for this circle will stop, and your group will see that you arrived.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Not yet'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text("I'm here"),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) await _controller.markArrived();
+  }
+
   Future<void> _inviteContacts() async {
     await Navigator.of(context).push<void>(
       MaterialPageRoute(
@@ -370,6 +394,16 @@ class CircleDetailScreenState extends State<CircleDetailScreen> {
                               action.busy ? 'Ending circle…' : 'End circle',
                             ),
                           ),
+                        if (circle.state == CircleState.active &&
+                            _myMember(circle).travelRole == TravelRole.mover &&
+                            _myMember(circle).arrivedAt == null) ...[
+                          const SizedBox(height: 10),
+                          FilledButton.tonalIcon(
+                            onPressed: action.busy ? null : _arrive,
+                            icon: const Icon(Icons.location_on_rounded),
+                            label: const Text("I'm here"),
+                          ),
+                        ],
                       ],
                     ),
                   ),

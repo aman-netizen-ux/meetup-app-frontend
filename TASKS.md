@@ -36,7 +36,7 @@ This repository owns the Flutter Android/iOS client: screens, route choice, perm
 
 | ID | Status | Task and acceptance checks | Depends on / backend partner |
 |---|---|---|---|
-| F-14 | TODO | Register push tokens; handle arrival and meaningful ETA/leg notifications when the app is foregrounded or backgrounded. Arrival shows Here; personal early/late text appears only when time is set. Provide organizer end/cancel action and an Ended summary. | F-09, F-13 / B-12, B-13 |
+| F-14 | IN PROGRESS | Firebase Messaging registers Android tokens after sign-in, refreshes them safely, displays foreground notifications, and receives background notification payloads. Movers can mark themselves Here, which stops sharing and renders the existing Ended summary when appropriate. The remaining acceptance check is a real-device FCM delivery test after the backend is running with Firebase Admin credentials. | F-09, F-13 / B-12, B-13 |
 | F-15 | TODO | Run end-to-end tests on two or more real devices across Android and iOS: create/join, route choice, departure, stale GPS, role switch, arrival, cancellation, timeout, and location deletion. Complete accessibility, battery, permission, and release configuration checks. Replace the local LAN `API_BASE_URL` with the deployed HTTPS backend URL for release; keep backend credentials out of Flutter. | F-04 through F-14 / B-14 |
 
 ## Cross-repo sequence

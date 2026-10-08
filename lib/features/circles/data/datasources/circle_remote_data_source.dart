@@ -47,6 +47,13 @@ class CircleRemoteDataSource {
         body: {'reason': reason},
       );
 
+  Future<Map<String, dynamic>> markArrived(String circleId) =>
+      _http.request(
+        'POST',
+        '/v1/circles/${Uri.encodeComponent(circleId)}/me/arrival',
+        body: const {},
+      );
+
   Future<Map<String, dynamic>> previewInvitation(String token) => _http.request(
     'GET',
     '/v1/invitations/${Uri.encodeComponent(token)}/preview',

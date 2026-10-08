@@ -22,6 +22,7 @@ abstract class CircleRepository {
     bool? isPrivatePlace,
   });
   Future<CircleSnapshot> endCircle(String circleId, EndReason reason);
+  Future<CircleSnapshot> markArrived(String circleId);
   Future<JoinPreview> previewInvitation(String token);
   Future<CircleSnapshot> acceptInvitation(String token, TravelRole role);
   Future<CircleSnapshot> changeMyRole(String circleId, TravelRole role);

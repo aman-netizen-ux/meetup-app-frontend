@@ -86,6 +86,21 @@ class CircleDetailController {
     }
   }
 
+  Future<bool> markArrived() async {
+    if (circle.value == null || action.value.busy) return false;
+    action.value = const CircleDetailActionState(busy: true);
+    try {
+      circle.value = await _repository.markArrived(circle.value!.id);
+      action.value = const CircleDetailActionState();
+      return true;
+    } catch (_) {
+      action.value = const CircleDetailActionState(
+        error: 'Could not mark you as here. Check your connection and try again.',
+      );
+      return false;
+    }
+  }
+
   void dispose() {
     _listening = false;
     circle.dispose();

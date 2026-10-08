@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:app_links/app_links.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'app/meetup_app.dart';
 import 'app/setup_required_screen.dart';
@@ -23,6 +24,15 @@ import 'features/contacts/data/platform/platform_share_service.dart';
 import 'features/contacts/data/repositories/contact_repository_impl.dart';
 import 'features/circles/data/platform/geolocator_mover_location_permission.dart';
 import 'features/circles/data/platform/geolocator_device_location_tracker.dart';
+import 'features/notifications/data/datasources/push_token_remote_data_source.dart';
+import 'features/notifications/data/repositories/firebase_push_token_registrar.dart';
+import 'features/notifications/presentation/state/push_message_controller.dart';
+import 'features/notifications/presentation/state/push_registration_controller.dart';
+
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(options: FirebaseAppConfig.options);
+}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,6 +44,7 @@ Future<void> main() async {
   }
 
   await Firebase.initializeApp(options: options);
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   final phoneAuth = FirebasePhoneAuthDataSource(FirebaseAuth.instance);
   final http = JsonHttpClient(
     baseUri: apiBaseUri,
@@ -44,6 +55,12 @@ Future<void> main() async {
     ProfileRemoteDataSource(http),
   );
   final controller = AuthController(repository)..start();
+  final pushRegistration = PushRegistrationController(
+    controller,
+    FirebasePushTokenRegistrar(FirebaseMessaging.instance, PushTokenRemoteDataSource(http)),
+  );
+  pushRegistration.start();
+  final pushMessages = PushMessageController()..start();
   final pendingInvitation = PendingInvitationController();
   final appLinks = AppLinkDataSource(AppLinks());
   final initialLink = await appLinks.initialLink();
@@ -62,6 +79,7 @@ Future<void> main() async {
       shareService: const PlatformShareService(),
       moverLocationPermission: const GeolocatorMoverLocationPermission(),
       locationTracker: const GeolocatorDeviceLocationTracker(),
+      pushMessages: pushMessages,
     ),
   );
 }

@@ -54,4 +54,6 @@ Read this file, [ARCHITECTURE.md](ARCHITECTURE.md), [TASKS.md](TASKS.md), and [d
 
 ## How to continue
 
-Continue with the remaining F-12 device proof plus B-12/B-13/F-14: measure Android background/battery behavior, then add arrival and meaningful ETA/leg notifications, scheduled arming, automatic ending, timeout, and the Ended experience. iOS still needs an iPhone and Mac. Keep F-06 open until an owned HTTPS domain and store-install association are available.
+**F-14 is IN PROGRESS (2026-10-09).** Firebase Messaging is now composed in `main.dart`: after authenticated profile restoration it requests notification permission, registers the Android FCM token through `/v1/me/device-tokens`, and refreshes the token when Firebase changes it. Foreground messages show a scoped SnackBar; background messages are registered with Firebase's entry point. A mover can use the new “I'm here” action, which calls `/v1/circles/:id/me/arrival`; the existing snapshot/role/location controllers then stop tracking and render Here or the Ended summary. `flutter analyze --no-pub` and all 14 Flutter tests passed. A real Android FCM delivery check remains, as does iOS setup/testing; keep F-06 open until an owned HTTPS domain and store-install association are available.
+
+Continue with F-12 device proof, F-14 real-device push proof, then B-14/F-15 deployment and release hardening.

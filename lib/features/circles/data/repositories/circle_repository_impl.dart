@@ -75,6 +75,10 @@ class CircleRepositoryImpl implements CircleRepository {
       );
 
   @override
+  Future<CircleSnapshot> markArrived(String circleId) async =>
+      mapCircleSnapshot(await _remote.markArrived(circleId));
+
+  @override
   Future<JoinPreview> previewInvitation(String token) async =>
       mapJoinPreview(await _remote.previewInvitation(token));
 

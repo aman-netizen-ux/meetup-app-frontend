@@ -104,6 +104,9 @@ class FakeCircleRepository implements CircleRepository {
       throw UnimplementedError();
 
   @override
+  Future<CircleSnapshot> markArrived(String circleId) => throw UnimplementedError();
+
+  @override
   Future<JoinPreview> previewInvitation(String token) =>
       throw UnimplementedError();
 
