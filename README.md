@@ -71,3 +71,5 @@ While circle details are open, the client long-polls `GET /v1/circles/:id/events
 ## Route selection
 
 After an Active ready mover starts public location sharing, circle details load short-lived server-owned walking, road, and estimated public-transport options. Nothing is inferred from device motion: the mover must tap a route. The chosen route persists on the backend, its geometry appears on the live map, and its leg summary remains visible while another option can be selected. Provider failures and empty results show an inline retry without stopping location sharing.
+
+Accepted points advance the selected route and refresh a personal ETA range. The signed-in mover reads private leave-by data from `/v1/circles/:id/me`; shared snapshots never contain it. Timed circles show a conservative leave countdown, while untimed circles show the ETA without early or late wording. Uploads adapt to observed movement and destination proximity, and GPS failure changes the location card to a paused state instead of presenting an old point as live.

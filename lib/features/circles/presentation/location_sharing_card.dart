@@ -113,6 +113,17 @@ class LocationSharingCard extends StatelessWidget {
                 ),
               ),
             ],
+            if (state.status == LocationSharingStatus.gpsPaused) ...[
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: controller.retryTracking,
+                  icon: const Icon(Icons.refresh_rounded),
+                  label: const Text('Resume GPS updates'),
+                ),
+              ),
+            ],
             if (monitoring) ...[
               const SizedBox(height: 12),
               SizedBox(
@@ -163,6 +174,7 @@ class LocationSharingCard extends StatelessWidget {
     LocationSharingStatus.monitoringDeparture => 'Watching for departure',
     LocationSharingStatus.startingSharing => 'Starting live sharing…',
     LocationSharingStatus.sharing => 'You’re sharing live',
+    LocationSharingStatus.gpsPaused => 'GPS updates paused',
     LocationSharingStatus.failure => 'Location needs attention',
   };
 
@@ -174,6 +186,8 @@ class LocationSharingCard extends StatelessWidget {
     LocationSharingStatus.startingSharing =>
       'Sharing starts automatically at about 150 m.',
     LocationSharingStatus.sharing => 'Only members of this circle can see your pin.',
+    LocationSharingStatus.gpsPaused =>
+      'Reconnect before relying on the last shared position.',
     LocationSharingStatus.failure => 'Try again when location access is available.',
     LocationSharingStatus.inactive => 'No location is being collected.',
   };
@@ -183,6 +197,7 @@ class LocationSharingCard extends StatelessWidget {
     LocationSharingStatus.monitoringDeparture ||
     LocationSharingStatus.startingSharing => Icons.directions_walk_rounded,
     LocationSharingStatus.failure => Icons.location_disabled_rounded,
+    LocationSharingStatus.gpsPaused => Icons.gps_off_rounded,
     LocationSharingStatus.inactive => Icons.location_off_outlined,
     _ => Icons.my_location_rounded,
   };

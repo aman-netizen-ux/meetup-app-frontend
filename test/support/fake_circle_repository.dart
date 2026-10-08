@@ -24,6 +24,9 @@ class FakeCircleRepository implements CircleRepository {
   int locationUpdates = 0;
   List<JourneyRouteOption> routeOptions = const [];
   JourneyRouteOption? selectedRoute;
+  PrivateJourney privateJourney = const PrivateJourney(
+    travelRole: TravelRole.mover,
+  );
   SharingTrigger? lastSharingTrigger;
   Completer<CircleSnapshot?> _nextChange = Completer();
 
@@ -82,8 +85,7 @@ class FakeCircleRepository implements CircleRepository {
   Future<List<CircleSummary>> listCircles() => throw UnimplementedError();
 
   @override
-  Future<PrivateJourney> getMyJourney(String circleId) =>
-      throw UnimplementedError();
+  Future<PrivateJourney> getMyJourney(String circleId) async => privateJourney;
 
   @override
   Future<CircleSnapshot> createCircle(CreateCircleInput input) =>

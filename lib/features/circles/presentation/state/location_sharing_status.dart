@@ -5,5 +5,6 @@ enum LocationSharingStatus {
   monitoringDeparture,
   startingSharing,
   sharing,
+  gpsPaused,
   failure,
 }

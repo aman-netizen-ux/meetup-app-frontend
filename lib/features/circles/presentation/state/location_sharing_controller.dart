@@ -11,6 +11,8 @@ import '../../domain/entities/member_presence.dart';
 import '../../domain/entities/setup_status.dart';
 import '../../domain/entities/sharing_trigger.dart';
 import '../../domain/entities/travel_role.dart';
+import '../../domain/entities/geo_point.dart';
+import '../../domain/location_sampling_policy.dart';
 import '../../domain/location_distance.dart';
 import '../../domain/repositories/circle_repository.dart';
 import '../../domain/repositories/device_location_tracker.dart';
@@ -27,6 +29,7 @@ class LocationSharingController extends ValueNotifier<LocationSharingState> {
     required String userId,
     required ValueChanged<CircleSnapshot> onSnapshot,
     LocationDistance distance = const LocationDistance(),
+    LocationSamplingPolicy sampling = const LocationSamplingPolicy(),
   }) : _repository = repository,
        _permission = permission,
        _tracker = tracker,
@@ -34,6 +37,7 @@ class LocationSharingController extends ValueNotifier<LocationSharingState> {
        _userId = userId,
        _onSnapshot = onSnapshot,
        _distance = distance,
+       _sampling = sampling,
        super(
          const LocationSharingState(
            status: LocationSharingStatus.inactive,
@@ -41,8 +45,6 @@ class LocationSharingController extends ValueNotifier<LocationSharingState> {
        );
 
   static const departureThresholdMeters = 150.0;
-  static const uploadInterval = Duration(seconds: 12);
-
   final CircleRepository _repository;
   final MoverLocationPermission _permission;
   final DeviceLocationTracker _tracker;
@@ -50,14 +52,18 @@ class LocationSharingController extends ValueNotifier<LocationSharingState> {
   final String _userId;
   final ValueChanged<CircleSnapshot> _onSnapshot;
   final LocationDistance _distance;
+  final LocationSamplingPolicy _sampling;
   StreamSubscription<DeviceLocation>? _subscription;
   DeviceLocation? _start;
   DeviceLocation? _latest;
+  DeviceLocation? _lastObserved;
+  GeoPoint? _destination;
   DateTime? _lastUploadAt;
   bool _uploading = false;
   bool _disposed = false;
 
   void sync(CircleSnapshot circle) {
+    _destination = circle.destination.point;
     final member = circle.members.where((item) => item.userId == _userId).firstOrNull;
     if (member == null || !_eligible(circle, member)) {
       _stop(_inactiveMessage(circle, member));
@@ -128,6 +134,16 @@ class LocationSharingController extends ValueNotifier<LocationSharingState> {
 
   Future<void> openSettings() => _permission.openSettings();
 
+  void retryTracking() {
+    if (value.status != LocationSharingStatus.gpsPaused) return;
+    _cancelStream();
+    value = const LocationSharingState(
+      status: LocationSharingStatus.sharing,
+      message: 'Reconnecting to GPS…',
+    );
+    _listen();
+  }
+
   bool _eligible(CircleSnapshot circle, CircleMember member) =>
       circle.state == CircleState.active &&
       member.travelRole == TravelRole.mover &&
@@ -155,8 +171,8 @@ class LocationSharingController extends ValueNotifier<LocationSharingState> {
       onError: (_) {
         if (_disposed) return;
         value = const LocationSharingState(
-          status: LocationSharingStatus.failure,
-          message: 'Location updates paused. Check location access and retry.',
+          status: LocationSharingStatus.gpsPaused,
+          message: 'GPS is paused. Your last point is no longer shown as live.',
         );
       },
     );
@@ -164,6 +180,8 @@ class LocationSharingController extends ValueNotifier<LocationSharingState> {
 
   Future<void> _onPosition(DeviceLocation location) async {
     if (_disposed) return;
+    final previousObserved = _lastObserved;
+    _lastObserved = location;
     _latest = location;
     if (value.status == LocationSharingStatus.monitoringDeparture &&
         _start != null) {
@@ -179,6 +197,11 @@ class LocationSharingController extends ValueNotifier<LocationSharingState> {
       return;
     }
     if (value.status != LocationSharingStatus.sharing || _uploading) return;
+    final uploadInterval = _sampling.uploadInterval(
+      current: location,
+      previous: previousObserved,
+      destination: _destination,
+    );
     final lastUpload = _lastUploadAt;
     if (lastUpload != null &&
         location.capturedAt.difference(lastUpload) < uploadInterval) {
@@ -236,6 +259,7 @@ class LocationSharingController extends ValueNotifier<LocationSharingState> {
     _cancelStream();
     _start = null;
     _latest = null;
+    _lastObserved = null;
     if (value.status != LocationSharingStatus.inactive ||
         value.message != message) {
       value = LocationSharingState(

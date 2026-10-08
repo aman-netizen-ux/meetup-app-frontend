@@ -23,6 +23,8 @@ import 'state/location_sharing_controller.dart';
 import 'state/route_selection_controller.dart';
 import 'state/route_selection_state.dart';
 import 'route_selection_card.dart';
+import 'private_journey_card.dart';
+import 'state/private_journey_controller.dart';
 
 class CircleDetailScreenState extends State<CircleDetailScreen> {
   late final CircleDetailController _controller = CircleDetailController(
@@ -53,6 +55,12 @@ class CircleDetailScreenState extends State<CircleDetailScreen> {
         circleId: widget.initial.id,
         userId: widget.currentUserId,
       );
+  late final PrivateJourneyController _privateJourneyController =
+      PrivateJourneyController(
+        repository: widget.repository,
+        circleId: widget.initial.id,
+        userId: widget.currentUserId,
+      );
 
   CircleMember _myMember(CircleSnapshot circle) => circle.members.firstWhere(
     (member) => member.userId == widget.currentUserId,
@@ -64,6 +72,7 @@ class CircleDetailScreenState extends State<CircleDetailScreen> {
     _controller.circle.addListener(_syncMyRole);
     _locationController.sync(widget.initial);
     _routeController.sync(widget.initial);
+    _privateJourneyController.sync(widget.initial);
     _controller.refresh();
     _controller.startLiveUpdates();
   }
@@ -76,6 +85,7 @@ class CircleDetailScreenState extends State<CircleDetailScreen> {
     _roleController.dispose();
     _locationController.dispose();
     _routeController.dispose();
+    _privateJourneyController.dispose();
     super.dispose();
   }
 
@@ -85,6 +95,7 @@ class CircleDetailScreenState extends State<CircleDetailScreen> {
       _roleController.sync(_myMember(circle));
       _locationController.sync(circle);
       _routeController.sync(circle);
+      _privateJourneyController.sync(circle);
     }
   }
 
@@ -255,6 +266,18 @@ class CircleDetailScreenState extends State<CircleDetailScreen> {
           ),
           const SizedBox(height: 16),
           RouteSelectionCard(controller: _routeController),
+          ValueListenableBuilder<CircleSnapshot?>(
+            valueListenable: _controller.circle,
+            builder: (context, circle, _) => circle == null
+                ? const SizedBox.shrink()
+                : Padding(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: PrivateJourneyCard(
+                      controller: _privateJourneyController,
+                      hasMeetupTime: circle.meetupTime != null,
+                    ),
+                  ),
+          ),
           const SizedBox(height: 24),
           const Text(
             'Your role',

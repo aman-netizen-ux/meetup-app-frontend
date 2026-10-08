@@ -11,6 +11,7 @@ class FakeDeviceLocationTracker implements DeviceLocationTracker {
       StreamController<DeviceLocation>.broadcast();
 
   void emit(DeviceLocation location) => _positions.add(location);
+  void emitError(Object error) => _positions.addError(error);
 
   @override
   Future<DeviceLocation> current() async => initial;

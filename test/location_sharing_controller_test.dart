@@ -5,6 +5,7 @@ import 'package:meetup_app_frontend/features/circles/domain/entities/setup_statu
 import 'package:meetup_app_frontend/features/circles/domain/entities/sharing_trigger.dart';
 import 'package:meetup_app_frontend/features/circles/presentation/state/location_sharing_controller.dart';
 import 'package:meetup_app_frontend/features/circles/presentation/state/location_sharing_status.dart';
+import 'package:meetup_app_frontend/features/circles/domain/entities/member_presence.dart';
 
 import 'support/circle_test_snapshot.dart';
 import 'support/fake_circle_repository.dart';
@@ -84,6 +85,38 @@ void main() {
 
     expect(repository.sharingStarts, 1);
     expect(repository.lastSharingTrigger, SharingTrigger.manual);
+    controller.dispose();
+    await tracker.close();
+  });
+
+  test('GPS errors stop presenting the point as live and can retry', () async {
+    final start = DeviceLocation(
+      latitude: 12.97,
+      longitude: 77.59,
+      accuracyMeters: 8,
+      capturedAt: DateTime.utc(2026, 10, 8, 10),
+    );
+    final tracker = FakeDeviceLocationTracker(start);
+    final repository = FakeCircleRepository(circleTestSnapshot(
+      setupStatus: SetupStatus.ready,
+      presence: MemberPresence.live,
+    ));
+    final controller = LocationSharingController(
+      repository: repository,
+      permission: FakeMoverLocationPermission(LocationPermissionResult.granted),
+      tracker: tracker,
+      circleId: 'circle-1',
+      userId: 'user-1',
+      onSnapshot: (_) {},
+    );
+    controller.sync(repository.snapshot);
+    tracker.emitError(StateError('GPS unavailable'));
+    await Future<void>.delayed(Duration.zero);
+    expect(controller.value.status, LocationSharingStatus.gpsPaused);
+    expect(controller.value.message, contains('no longer shown as live'));
+
+    controller.retryTracking();
+    expect(controller.value.status, LocationSharingStatus.sharing);
     controller.dispose();
     await tracker.close();
   });
