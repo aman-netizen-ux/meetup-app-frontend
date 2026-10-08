@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/presentation/shimmer_block.dart';
 import '../domain/entities/circle_snapshot.dart';
 import '../domain/entities/circle_state.dart';
 import '../domain/entities/circle_summary.dart';
@@ -194,8 +195,16 @@ class CirclesDashboardScreenState extends State<CirclesDashboardScreen> {
             valueListenable: widget.controller,
             builder: (context, state, _) => switch (state.status) {
               CirclesHomeStatus.loading => const Padding(
-                padding: EdgeInsets.all(40),
-                child: Center(child: CircularProgressIndicator()),
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: Column(
+                  children: [
+                    ShimmerBlock(height: 118),
+                    SizedBox(height: 12),
+                    ShimmerBlock(height: 118),
+                    SizedBox(height: 12),
+                    ShimmerBlock(height: 118),
+                  ],
+                ),
               ),
               CirclesHomeStatus.failure => _messageCard(
                 state.errorMessage ?? 'Could not load circles.',

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/presentation/shimmer_block.dart';
+
 import '../../circles/presentation/circles_dashboard_screen.dart';
 import '../../circles/presentation/state/circles_home_controller.dart';
 import '../../circles/domain/repositories/circle_repository.dart';
@@ -44,8 +46,25 @@ class AuthGate extends StatelessWidget {
   Widget build(BuildContext context) => ValueListenableBuilder<AuthState>(
     valueListenable: authController,
     builder: (context, state, _) => switch (state.status) {
-      AuthStatus.checking || AuthStatus.loadingProfile => const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+      AuthStatus.checking || AuthStatus.loadingProfile => Scaffold(
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                ShimmerBlock(width: 88, height: 14),
+                SizedBox(height: 14),
+                ShimmerBlock(height: 34),
+                SizedBox(height: 10),
+                ShimmerBlock(width: 230, height: 16),
+                SizedBox(height: 34),
+                ShimmerBlock(height: 54),
+              ],
+            ),
+          ),
+        ),
       ),
       AuthStatus.signedIn when state.user?.profileCompleted == false =>
         ProfileNameScreen(controller: authController),

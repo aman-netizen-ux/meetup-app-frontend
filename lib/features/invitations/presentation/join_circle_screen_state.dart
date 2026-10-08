@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/presentation/shimmer_block.dart';
 import '../../circles/domain/entities/travel_role.dart';
 import 'join_circle_screen.dart';
 import 'state/join_circle_controller.dart';
@@ -45,8 +46,20 @@ class JoinCircleScreenState extends State<JoinCircleScreen> {
     body: ValueListenableBuilder<JoinCircleState>(
       valueListenable: _controller,
       builder: (context, state, _) => switch (state.status) {
-        JoinCircleStatus.loading => const Center(
-          child: CircularProgressIndicator(),
+        JoinCircleStatus.loading => const Padding(
+          padding: EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ShimmerBlock(width: 88, height: 14),
+              SizedBox(height: 16),
+              ShimmerBlock(height: 34),
+              SizedBox(height: 12),
+              ShimmerBlock(width: 240, height: 16),
+              SizedBox(height: 28),
+              ShimmerBlock(height: 190),
+            ],
+          ),
         ),
         JoinCircleStatus.expired || JoinCircleStatus.failure => _failure(state),
         _ => _preview(state),

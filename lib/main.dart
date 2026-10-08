@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -33,6 +35,17 @@ import 'features/notifications/presentation/state/push_registration_controller.d
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: FirebaseAppConfig.options);
 }
+Future<void> openInitialInvitation(
+  AppLinkDataSource appLinks,
+  PendingInvitationController pendingInvitation,
+) async {
+  try {
+    final initialLink = await appLinks.initialLink().timeout(
+      const Duration(seconds: 5),
+    );
+    if (initialLink != null) pendingInvitation.open(initialLink);
+  } on TimeoutException {}
+}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -63,9 +76,8 @@ Future<void> main() async {
   final pushMessages = PushMessageController()..start();
   final pendingInvitation = PendingInvitationController();
   final appLinks = AppLinkDataSource(AppLinks());
-  final initialLink = await appLinks.initialLink();
-  if (initialLink != null) pendingInvitation.open(initialLink);
   appLinks.links.listen(pendingInvitation.open);
+  unawaited(openInitialInvitation(appLinks, pendingInvitation));
   runApp(
     MeetupApp(
       authController: controller,
@@ -83,3 +95,4 @@ Future<void> main() async {
     ),
   );
 }
+

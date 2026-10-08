@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/presentation/shimmer_block.dart';
 import '../domain/entities/contact_invite_candidate.dart';
 import '../domain/entities/contact_match_status.dart';
 import 'contact_invite_screen.dart';
@@ -82,8 +83,19 @@ class ContactInviteScreenState extends State<ContactInviteScreen> {
     body: ValueListenableBuilder<ContactListState>(
       valueListenable: _controller,
       builder: (context, state, _) => switch (state.status) {
-        ContactListStatus.loading => const Center(
-          child: CircularProgressIndicator(),
+        ContactListStatus.loading => const Padding(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            children: [
+              ShimmerBlock(height: 52),
+              SizedBox(height: 18),
+              ShimmerBlock(height: 72),
+              SizedBox(height: 12),
+              ShimmerBlock(height: 72),
+              SizedBox(height: 12),
+              ShimmerBlock(height: 72),
+            ],
+          ),
         ),
         ContactListStatus.ready => _contactList(state.contacts),
         ContactListStatus.empty => _message(

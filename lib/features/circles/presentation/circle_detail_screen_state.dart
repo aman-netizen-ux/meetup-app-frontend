@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/presentation/shimmer_block.dart';
 import '../../contacts/presentation/contact_invite_screen.dart';
 import '../../invitations/presentation/invitation_link_panel.dart';
 import '../../invitations/presentation/state/invitation_link_controller.dart';
@@ -264,7 +265,7 @@ class CircleDetailScreenState extends State<CircleDetailScreen> {
           ValueListenableBuilder<CircleSnapshot?>(
             valueListenable: _controller.circle,
             builder: (context, circle, _) => circle == null
-                ? const Center(child: CircularProgressIndicator())
+                ? const ShimmerBlock(height: 176)
                 : CircleHeaderCard(circle: circle),
           ),
           const SizedBox(height: 24),

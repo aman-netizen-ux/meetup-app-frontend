@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/presentation/shimmer_block.dart';
 import 'state/private_journey_controller.dart';
 import 'state/private_journey_state.dart';
 import 'state/private_journey_status.dart';
@@ -24,11 +25,9 @@ class PrivateJourneyCard extends StatelessWidget {
         return const SizedBox.shrink();
       }
       if (state.status == PrivateJourneyStatus.loading && journey == null) {
-        return const Center(
-          child: Padding(
-            padding: EdgeInsets.all(16),
-            child: CircularProgressIndicator(),
-          ),
+        return const Padding(
+          padding: EdgeInsets.symmetric(vertical: 8),
+          child: ShimmerBlock(height: 146),
         );
       }
       if (state.status == PrivateJourneyStatus.failure && journey == null) {
