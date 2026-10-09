@@ -69,7 +69,9 @@ Future<void> main() async {
     phoneAuth,
     ProfileRemoteDataSource(http),
   );
-  final controller = AuthController(repository)..start();
+  final profileReadiness = phoneAuth.isSignedIn ? http.warmUp() : null;
+  final controller = AuthController(repository)
+    ..start(profileReadiness: profileReadiness);
   final pushRegistration = PushRegistrationController(
     controller,
     FirebasePushTokenRegistrar(FirebaseMessaging.instance, PushTokenRemoteDataSource(http)),

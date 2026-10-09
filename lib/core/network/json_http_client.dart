@@ -20,6 +20,24 @@ class JsonHttpClient {
   final HttpClient _httpClient;
   static const _requestTimeout = Duration(seconds: 15);
 
+  /// Best-effort readiness request used before restoring an existing session.
+  ///
+  /// Free staging hosts may need time to start after inactivity. Waking the
+  /// public endpoint first keeps the bearer-token request from being retried
+  /// against a host that is still starting.
+  Future<void> warmUp() async {
+    try {
+      await request(
+        'GET',
+        '/health',
+        requiresAuth: false,
+        timeout: const Duration(seconds: 75),
+      );
+    } on ApiError {
+      // The following authenticated request retains its own recovery state.
+    }
+  }
+
   Future<Map<String, dynamic>> request(
     String method,
     String path, {

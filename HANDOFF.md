@@ -70,4 +70,6 @@ The connected Android phone installed the rebuilt APK, restored its Firebase ses
 
 **Splash experience (2026-10-09).** The Android launch window now uses the branded launcher icon on the matching light or dark canvas before Flutter's first frame. `MeetupSplashScreen` then replaces account-loading shimmer with a cached logo, a composited rotation/pulse orbit, and a clear loading label. It creates one animation controller only while account restoration is pending and disposes it immediately on navigation; there are no GIFs, videos, network calls, or recurring timers.
 
+**Staging wake-up sequencing (2026-10-09).** If Firebase already has a user, `main.dart` starts a best-effort public `/health` request before it asks `AuthController` to restore the bearer-authenticated profile. The splash stays visible while a free Render instance wakes; the authenticated request then begins against a responsive server. Sign-in after a signed-out launch remains immediate, and failed warm-up keeps the existing account-recovery behavior.
+
 Continue with F-12 device proof, then B-14/F-15 deployment and release hardening.

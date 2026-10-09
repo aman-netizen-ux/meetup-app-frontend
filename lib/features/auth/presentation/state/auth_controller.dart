@@ -16,10 +16,15 @@ class AuthController extends ValueNotifier<AuthState> {
   Future<void>? _profileLoad;
   int _sessionGeneration = 0;
 
-  void start() {
+  void start({Future<void>? profileReadiness}) {
     _subscription ??= _repository.signedInChanges.listen(
-      (signedIn) {
+      (signedIn) async {
         if (signedIn) {
+          final generation = _sessionGeneration;
+          if (profileReadiness != null) await profileReadiness;
+          if (generation != _sessionGeneration || !_repository.isSignedIn) {
+            return;
+          }
           unawaited(loadProfile());
         } else {
           _sessionGeneration++;
