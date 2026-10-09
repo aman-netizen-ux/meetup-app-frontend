@@ -240,10 +240,8 @@ class CircleDetailScreenState extends State<CircleDetailScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    backgroundColor: const Color(0xFFF7F4EE),
     appBar: AppBar(
       title: const Text('Circle details'),
-      backgroundColor: const Color(0xFFF7F4EE),
       actions: [
         Padding(
           padding: const EdgeInsets.only(right: 12),

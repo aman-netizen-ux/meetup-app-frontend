@@ -81,9 +81,7 @@ class CirclesDashboardScreenState extends State<CirclesDashboardScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    backgroundColor: const Color(0xFFF7F4EE),
     appBar: AppBar(
-      backgroundColor: const Color(0xFFF7F4EE),
       title: const Text(
         'meetup.',
         style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: -1.5),

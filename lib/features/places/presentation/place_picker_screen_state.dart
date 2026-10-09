@@ -38,10 +38,8 @@ class PlacePickerScreenState extends State<PlacePickerScreen> {
   Widget build(BuildContext context) {
     final color = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F4EE),
       appBar: AppBar(
         title: const Text('Choose a place'),
-        backgroundColor: const Color(0xFFF7F4EE),
       ),
       body: SafeArea(
         child: Column(
@@ -56,7 +54,7 @@ class PlacePickerScreenState extends State<PlacePickerScreen> {
                   hintText: 'Search a cafe, address or landmark',
                   prefixIcon: const Icon(Icons.search_rounded),
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: color.surface,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(18),
                     borderSide: BorderSide.none,

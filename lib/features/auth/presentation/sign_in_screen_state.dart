@@ -36,6 +36,15 @@ class SignInScreenState extends State<SignInScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  Center(
+                    child: Image.asset(
+                      'assets/branding/meetup-logo-v1.png',
+                      width: 92,
+                      height: 92,
+                      semanticLabel: 'Meetup',
+                    ),
+                  ),
+                  const SizedBox(height: 18),
                   Text(
                     codeStep ? 'Enter your SMS code' : 'Your phone number',
                     style: Theme.of(context).textTheme.headlineSmall,

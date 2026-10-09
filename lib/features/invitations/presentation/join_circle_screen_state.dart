@@ -34,9 +34,7 @@ class JoinCircleScreenState extends State<JoinCircleScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    backgroundColor: const Color(0xFFF7F4EE),
     appBar: AppBar(
-      backgroundColor: const Color(0xFFF7F4EE),
       title: const Text('Join this circle'),
       leading: IconButton(
         onPressed: widget.onClose,

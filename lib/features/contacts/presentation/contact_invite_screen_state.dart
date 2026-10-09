@@ -75,10 +75,8 @@ class ContactInviteScreenState extends State<ContactInviteScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    backgroundColor: const Color(0xFFF7F4EE),
     appBar: AppBar(
       title: const Text('Invite contacts'),
-      backgroundColor: const Color(0xFFF7F4EE),
     ),
     body: ValueListenableBuilder<ContactListState>(
       valueListenable: _controller,
@@ -144,7 +142,7 @@ class ContactInviteScreenState extends State<ContactInviteScreen> {
                 hintText: 'Search contacts',
                 prefixIcon: const Icon(Icons.search_rounded),
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: Theme.of(context).colorScheme.surface,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(18),
                   borderSide: BorderSide.none,

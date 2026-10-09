@@ -30,22 +30,24 @@ class _ShimmerBlockState extends State<ShimmerBlock>
   }
 
   @override
-  Widget build(BuildContext context) => AnimatedBuilder(
-    animation: _controller,
-    builder: (context, child) => DecoratedBox(
+  Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final colors = dark
+        ? const [Color(0xFF23384C), Color(0xFF30485D), Color(0xFF23384C)]
+        : const [Color(0xFFE6E8E4), Color(0xFFF8FAF7), Color(0xFFE6E8E4)];
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) => DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: widget.borderRadius,
         gradient: LinearGradient(
           begin: Alignment(-1.4 + (_controller.value * 2.8), 0),
           end: Alignment(-0.4 + (_controller.value * 2.8), 0),
-          colors: const [
-            Color(0xFFE6E8E4),
-            Color(0xFFF8FAF7),
-            Color(0xFFE6E8E4),
-          ],
+          colors: colors,
         ),
       ),
       child: SizedBox(width: widget.width, height: widget.height),
     ),
-  );
+    );
+  }
 }

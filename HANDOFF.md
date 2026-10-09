@@ -62,4 +62,6 @@ Read this file, [ARCHITECTURE.md](ARCHITECTURE.md), [TASKS.md](TASKS.md), and [d
 
 **Startup and loading UI repair (2026-10-09).** `main()` no longer blocks `runApp()` on the app-link plugin's initial-link lookup. The lookup now runs after the app renders and gives up after five seconds; streamed links continue to be processed. Firebase token lookup is bounded at 12 seconds, allowing the existing retry state to replace an indefinite loading screen. Shared shimmer blocks now cover startup, circle-list, circle-detail, invitation-preview, contacts, and private-ETA content loading; short action submissions retain compact progress indicators.
 
+**Branding and appearance (2026-10-09).** The generated Meetup mark is stored in `assets/branding/meetup-logo-v1.png`, used on the sign-in screen, and packaged into each Android launcher-icon density. `MeetupTheme` supplies paired Material 3 light and dark themes. `MaterialApp` follows the device `ThemeMode.system`; shared canvas, app bar, cards, inputs, shimmer blocks, and the core dashboard/create/detail/join/contact/place-picker surfaces now derive their readable colours from the active theme. The generated Play Store source icon remains the 1254 px branding asset; keep that source when exporting store listing artwork.
+
 Continue with F-12 device proof, then B-14/F-15 deployment and release hardening.

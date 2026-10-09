@@ -30,7 +30,10 @@ class LocationSharingCard extends StatelessWidget {
       return Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.white, accent.withValues(alpha: 0.08)],
+            colors: [
+              Theme.of(context).colorScheme.surface,
+              accent.withValues(alpha: 0.12),
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -59,17 +62,17 @@ class LocationSharingCard extends StatelessWidget {
                     children: [
                       Text(
                         _title(state.status),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w900,
-                          color: Color(0xFF17283E),
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         _subtitle(state),
-                        style: const TextStyle(
-                          color: Color(0xFF677381),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           height: 1.3,
                         ),
                       ),

@@ -59,10 +59,8 @@ class CreateCircleScreenState extends State<CreateCircleScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    backgroundColor: const Color(0xFFF7F4EE),
     appBar: AppBar(
       title: const Text('New circle'),
-      backgroundColor: const Color(0xFFF7F4EE),
     ),
     body: ValueListenableBuilder<CircleEditorState>(
       valueListenable: _controller,

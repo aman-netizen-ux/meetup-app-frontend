@@ -14,7 +14,7 @@ class CircleMemberCard extends StatelessWidget {
     final status = _statusLabel;
     final statusColor = _statusColor;
     return Card(
-      color: Colors.white,
+      color: Theme.of(context).colorScheme.surface,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
@@ -55,7 +55,9 @@ class CircleMemberCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     _journeyLabel,
-                    style: const TextStyle(color: Color(0xFF677381)),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),
