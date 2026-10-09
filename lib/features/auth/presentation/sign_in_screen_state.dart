@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'phone_country.dart';
 import 'sign_in_screen.dart';
 import 'state/auth_state.dart';
 import 'state/auth_status.dart';
@@ -7,6 +8,18 @@ import 'state/auth_status.dart';
 class SignInScreenState extends State<SignInScreen> {
   final _phone = TextEditingController();
   final _code = TextEditingController();
+  PhoneCountry _country = PhoneCountry.india;
+
+  String get _phoneE164 {
+    final input = _phone.text.trim();
+    if (input.startsWith('+')) {
+      return input.replaceAll(RegExp(r'[^+0-9]'), '');
+    }
+    final localDigits = input
+        .replaceAll(RegExp(r'[^0-9]'), '')
+        .replaceFirst(RegExp(r'^0+'), '');
+    return '${_country.dialCode}$localDigits';
+  }
 
   @override
   void dispose() {
@@ -52,29 +65,80 @@ class SignInScreenState extends State<SignInScreen> {
                   const SizedBox(height: 8),
                   Text(
                     codeStep
-                        ? 'We sent a code to ${state.phoneE164}.'
-                        : 'Use your number with country code. Your number will be used to verify your account.',
+                        ? 'We sent a code to ${state.phoneE164}. It may appear above your keyboard.'
+                        : 'Choose your country, then enter your mobile number.',
                   ),
                   const SizedBox(height: 20),
-                  if (codeStep)
-                    TextField(
-                      controller: _code,
-                      keyboardType: TextInputType.number,
-                      autofillHints: const [AutofillHints.oneTimeCode],
-                      decoration: const InputDecoration(
-                        labelText: 'Verification code',
-                      ),
-                    )
-                  else
-                    TextField(
-                      controller: _phone,
-                      keyboardType: TextInputType.phone,
-                      autofillHints: const [AutofillHints.telephoneNumber],
-                      decoration: const InputDecoration(
-                        labelText: 'Phone number',
-                        hintText: '+919876543210',
-                      ),
-                    ),
+                  AutofillGroup(
+                    child: codeStep
+                        ? TextField(
+                            controller: _code,
+                            keyboardType: TextInputType.number,
+                            textInputAction: TextInputAction.done,
+                            autofillHints: const [AutofillHints.oneTimeCode],
+                            enableSuggestions: true,
+                            autocorrect: false,
+                            onSubmitted: busy
+                                ? null
+                                : (value) => widget.controller.verifyCode(value),
+                            decoration: const InputDecoration(
+                              labelText: 'Verification code',
+                              hintText: 'Enter the 6-digit code',
+                            ),
+                          )
+                        : Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                width: 166,
+                                child: DropdownButtonFormField<PhoneCountry>(
+                                  initialValue: _country,
+                                  isExpanded: true,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Country',
+                                  ),
+                                  items: PhoneCountry.supported
+                                      .map(
+                                        (country) => DropdownMenuItem(
+                                          value: country,
+                                          child: Text(
+                                            country.label,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
+                                  onChanged: busy
+                                      ? null
+                                      : (country) {
+                                          if (country == null) return;
+                                          setState(() => _country = country);
+                                        },
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: TextField(
+                                  controller: _phone,
+                                  keyboardType: TextInputType.phone,
+                                  textInputAction: TextInputAction.done,
+                                  autofillHints: const [
+                                    AutofillHints.telephoneNumber,
+                                  ],
+                                  onSubmitted: busy
+                                      ? null
+                                      : (_) => widget.controller.sendCode(
+                                          _phoneE164,
+                                        ),
+                                  decoration: const InputDecoration(
+                                    labelText: 'Mobile number',
+                                    hintText: '98765 43210',
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                  ),
                   if (state.errorMessage != null) ...[
                     const SizedBox(height: 12),
                     Text(
@@ -90,10 +154,12 @@ class SignInScreenState extends State<SignInScreen> {
                         ? null
                         : codeStep
                         ? () => widget.controller.verifyCode(_code.text)
-                        : () => widget.controller.sendCode(_phone.text),
+                        : () => widget.controller.sendCode(_phoneE164),
                     child: Text(
                       busy
-                          ? 'Please wait…'
+                          ? codeStep
+                                ? 'Verifying code…'
+                                : 'Sending secure code…'
                           : codeStep
                           ? 'Verify and sign in'
                           : 'Send code',

@@ -104,6 +104,12 @@ class AuthController extends ValueNotifier<AuthState> {
           phoneE164: phone,
         );
       }
+    } on TimeoutException {
+      value = const AuthState(
+        status: AuthStatus.signedOut,
+        errorMessage:
+            'Could not start phone verification. Check your internet connection and try again.',
+      );
     } catch (_) {
       value = const AuthState(
         status: AuthStatus.signedOut,

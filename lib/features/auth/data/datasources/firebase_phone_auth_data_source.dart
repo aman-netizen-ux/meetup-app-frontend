@@ -18,29 +18,46 @@ class FirebasePhoneAuthDataSource {
     return user.getIdToken().timeout(const Duration(seconds: 30));
   }
 
-  Future<String> sendCode(String phoneE164) async {
+  Future<String> sendCode(String phoneE164) {
     final result = Completer<String>();
-    await _auth.verifyPhoneNumber(
-      phoneNumber: phoneE164,
-      verificationCompleted: (credential) async {
-        try {
-          await _auth.signInWithCredential(credential);
-          if (!result.isCompleted) result.complete('');
-        } catch (error) {
-          if (!result.isCompleted) result.completeError(error);
-        }
-      },
-      verificationFailed: (error) {
-        if (!result.isCompleted) result.completeError(error);
-      },
-      codeSent: (verificationId, _) {
-        if (!result.isCompleted) result.complete(verificationId);
-      },
-      codeAutoRetrievalTimeout: (verificationId) {
-        if (!result.isCompleted) result.complete(verificationId);
-      },
+    try {
+      unawaited(
+        _auth
+            .verifyPhoneNumber(
+              phoneNumber: phoneE164,
+              verificationCompleted: (credential) async {
+                try {
+                  await _auth.signInWithCredential(credential);
+                  if (!result.isCompleted) result.complete('');
+                } catch (error, stackTrace) {
+                  if (!result.isCompleted) {
+                    result.completeError(error, stackTrace);
+                  }
+                }
+              },
+              verificationFailed: (error) {
+                if (!result.isCompleted) result.completeError(error);
+              },
+              codeSent: (verificationId, _) {
+                if (!result.isCompleted) result.complete(verificationId);
+              },
+              codeAutoRetrievalTimeout: (verificationId) {
+                if (!result.isCompleted) result.complete(verificationId);
+              },
+            )
+            .catchError((Object error, StackTrace stackTrace) {
+              if (!result.isCompleted) result.completeError(error, stackTrace);
+            }),
+      );
+    } catch (error, stackTrace) {
+      if (!result.isCompleted) result.completeError(error, stackTrace);
+    }
+    return result.future.timeout(
+      const Duration(seconds: 45),
+      onTimeout: () => throw TimeoutException(
+        'Phone verification did not start in time.',
+      ),
     );
-    return result.future;
   }
 
   Future<void> verifyCode(String verificationId, String smsCode) async {
