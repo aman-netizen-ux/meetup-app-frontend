@@ -15,7 +15,7 @@ class FirebasePhoneAuthDataSource {
   Future<String?> accessToken() {
     final user = _auth.currentUser;
     if (user == null) return Future.value();
-    return user.getIdToken().timeout(const Duration(seconds: 12));
+    return user.getIdToken().timeout(const Duration(seconds: 30));
   }
 
   Future<String> sendCode(String phoneE164) async {

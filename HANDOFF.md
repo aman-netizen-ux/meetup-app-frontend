@@ -64,4 +64,8 @@ Read this file, [ARCHITECTURE.md](ARCHITECTURE.md), [TASKS.md](TASKS.md), and [d
 
 **Branding and appearance (2026-10-09).** The generated Meetup mark is stored in `assets/branding/meetup-logo-v1.png`, used on the sign-in screen, and packaged into each Android launcher-icon density. `MeetupTheme` supplies paired Material 3 light and dark themes. `MaterialApp` follows the device `ThemeMode.system`; shared canvas, app bar, cards, inputs, shimmer blocks, and the core dashboard/create/detail/join/contact/place-picker surfaces now derive their readable colours from the active theme. The generated Play Store source icon remains the 1254 px branding asset; keep that source when exporting store listing artwork.
 
+**Staging sign-in resilience and orientation (2026-10-09).** Android `MainActivity` is explicitly portrait. Firebase session-token refresh may take up to 30 seconds and the initial authenticated profile request may take 75 seconds, allowing the Render free instance to wake before the app displays a failure. This longer allowance is scoped to `GET /v1/me`; regular API requests retain their 15-second timeout.
+
+The connected Android phone installed the rebuilt APK, restored its Firebase session, and reached the server-backed dashboard after the new allowance. Android reported portrait orientation for `MainActivity`.
+
 Continue with F-12 device proof, then B-14/F-15 deployment and release hardening.

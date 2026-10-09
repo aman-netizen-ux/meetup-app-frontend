@@ -55,16 +55,22 @@ class AuthController extends ValueNotifier<AuthState> {
         value = AuthState(status: AuthStatus.signedIn, user: user);
       }
     } on ApiError catch (error) {
+      if (kDebugMode) {
+        debugPrint(
+          'Profile load failed: ${error.code} (${error.statusCode ?? 'no status'}) ${error.message}',
+        );
+      }
       if (generation != _sessionGeneration) return;
       if (error.statusCode == 401) {
         await signOut();
         return;
       }
-      value = const AuthState(
+      value = AuthState(
         status: AuthStatus.failure,
-        errorMessage: 'Could not load your account. Check the API and retry.',
+        errorMessage: _profileFailureMessage(error),
       );
-    } catch (_) {
+    } catch (error) {
+      if (kDebugMode) debugPrint('Profile load failed unexpectedly: $error');
       if (generation != _sessionGeneration) return;
       value = const AuthState(
         status: AuthStatus.failure,
@@ -146,6 +152,11 @@ class AuthController extends ValueNotifier<AuthState> {
     _profileLoad = null;
     await _repository.signOut();
     value = const AuthState(status: AuthStatus.signedOut);
+  }
+
+  String _profileFailureMessage(ApiError error) {
+    const message = 'Could not load your account. Check the API and retry.';
+    return kDebugMode ? '$message (${error.code})' : message;
   }
 
   @override
