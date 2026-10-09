@@ -68,4 +68,6 @@ Read this file, [ARCHITECTURE.md](ARCHITECTURE.md), [TASKS.md](TASKS.md), and [d
 
 The connected Android phone installed the rebuilt APK, restored its Firebase session, and reached the server-backed dashboard after the new allowance. Android reported portrait orientation for `MainActivity`.
 
+**Splash experience (2026-10-09).** The Android launch window now uses the branded launcher icon on the matching light or dark canvas before Flutter's first frame. `MeetupSplashScreen` then replaces account-loading shimmer with a cached logo, a composited rotation/pulse orbit, and a clear loading label. It creates one animation controller only while account restoration is pending and disposes it immediately on navigation; there are no GIFs, videos, network calls, or recurring timers.
+
 Continue with F-12 device proof, then B-14/F-15 deployment and release hardening.

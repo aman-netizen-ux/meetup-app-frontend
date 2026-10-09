@@ -44,7 +44,9 @@ Future<void> openInitialInvitation(
       const Duration(seconds: 5),
     );
     if (initialLink != null) pendingInvitation.open(initialLink);
-  } on TimeoutException {}
+  } on TimeoutException {
+    return;
+  }
 }
 
 Future<void> main() async {
